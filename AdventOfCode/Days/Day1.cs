@@ -1,17 +1,35 @@
-﻿using System.IO.MemoryMappedFiles;
+﻿using System.Diagnostics;
+using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace AdventOfCode.Days
 {
-    public class Day1 : IDay
+    public class Day1 : Day
     {
-        public void RunPart1()
+        string[] map = new string [0];
+        public override void Initialize(InstanceDownloader downloader)
+        {
+            base.Initialize(downloader);
+
+            map = ["zero",
+                "one",
+                "two",
+                "three",
+                "four",
+                "five",
+                "six",
+                "seven",
+                "eight",
+                "nine"];
+        }
+
+        public override int RunPart1()
         {
             int sum = 0;
 
-            foreach (var line in File.ReadAllLines("input/input1.txt"))
+            foreach (var line in Lines)
             {
                 int lineValue = 0;
 
@@ -36,26 +54,71 @@ namespace AdventOfCode.Days
                 sum += lineValue;
             }
 
-            Console.WriteLine("Day 1 Part 1: " + sum);
+            return sum;
         }
 
-        public void RunPart2()
+        public override int RunPart2()
         {
-            Regex regex = new Regex("(?=(zero|one|two|three|four|five|six|seven|eight|nine|[0-9]))");
             int sum = 0;
-            string[] map = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
-
-            int Parse(string input) => input.Length == 1 ? input[0] - '0' : Array.IndexOf(map, input);
-            foreach (var line in File.ReadAllLines("input/input1.txt"))
+            foreach (var line in Lines)
             {
-                var matches = regex.Matches(line);
-                var left = matches[0].Groups[1].Value;
-                var right = matches[matches.Count - 1].Groups[1].Value;
+                var left = GetLeftValue(line);
+                var right = GetRightValue(line);
 
-                sum += 10 * Parse(left) + Parse(right);
+                sum += 10 * left + right;
             }
 
-            Console.WriteLine($"Day 1 Part 2: {sum}");
+            return sum;
+        }
+
+        int GetLeftValue(ReadOnlySpan<char> input)
+        {
+            while(input.Length > 0)
+            {
+                if (char.IsDigit(input[0]))
+                {
+                    return input[0] - '0';
+                }
+                else
+                {
+                    for (int j = 0; j < map.Length; j++)
+                    {
+                        if (input.StartsWith(map[j]))
+                        {
+                            return j;
+                        }
+                    }
+                }
+
+                input = input[1..];
+            }
+
+            return -1;
+        }
+
+        int GetRightValue(ReadOnlySpan<char> input)
+        {
+            while (input.Length > 0)
+            {
+                if (char.IsDigit(input[input.Length - 1]))
+                {
+                    return input[input.Length - 1] - '0';
+                }
+                else
+                {
+                    for (int j = 0; j < map.Length; j++)
+                    {
+                        if (input.EndsWith(map[j]))
+                        {
+                            return j;
+                        }
+                    }
+                }
+
+                input = input[.. (input.Length - 1)];
+            }
+
+            return -1;
         }
     }
 }

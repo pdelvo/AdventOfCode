@@ -1,16 +1,18 @@
-﻿using System.IO.MemoryMappedFiles;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace AdventOfCode.Days
 {
-    public class Day3 : IDay
+    [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+    public class Day3 : Day
     {
-        public void RunPart1()
+        public override int RunPart1()
         {
             int sum = 0;
-            string[] lines = File.ReadAllLines("Input/input3.txt");
+            string[] lines = Lines;
 
             for (int i = 0; i < lines.Length; i++)
             {
@@ -33,7 +35,7 @@ namespace AdventOfCode.Days
                     }
                 }
             }
-            Console.WriteLine("Day 3 Part 1: " + sum);
+            return sum;
         }
 
         private bool IsSurroundedBySymbol(string[] lines, int lineNumber, int lineStart, int length, char? symbol, out List<(int x, int y)> positions)
@@ -79,10 +81,10 @@ namespace AdventOfCode.Days
             return (int.Parse(str[position..]), str.Length - position);
         }
 
-        public void RunPart2()
+        public override int RunPart2()
         {
             int sum = 0;
-            string[] lines = File.ReadAllLines("Input/input3.txt");
+            string[] lines = Lines;
 
             Dictionary<(int x, int y), int> gears = new Dictionary<(int x, int y), int>();
             Dictionary<(int x, int y), int> result = new Dictionary<(int x, int y), int>();
@@ -129,7 +131,7 @@ namespace AdventOfCode.Days
 
             sum = result.Values.Sum();
 
-            Console.WriteLine("Day 3 Part 2: " + sum);
+            return sum;
         }
     }
 }

@@ -5,28 +5,24 @@ using System.Threading;
 
 namespace AdventOfCode.Days
 {
-    public class Day4 : IDay
+    public class Day4 : Day
     {
-        string[] lines;
-        public Day4()
+        public override int RunPart1()
         {
-            lines = File.ReadAllLines("Input/input4.txt");
-        }
-
-        public void RunPart1()
-        {
-            int[] winningNumberBuffer = new int[100];
-            int[] numberBuffer = new int[100];
+            Span<int> winningNumberBuffer = stackalloc int[100];
+            Span<int> numberBuffer = stackalloc int[100];
             int sum = 0;
+
+            var lines = Lines;
 
             for (int i = 0; i < lines.Length; i++)
             {
                 int colon = lines[i].IndexOf(':');
                 int pipe = lines[i].IndexOf('|');
-                var winningNumberRemaining = ((ReadOnlySpan<char>)lines[i])[(colon + 1)..pipe];
-                var numberRemaining = ((ReadOnlySpan<char>)lines[i])[(pipe + 1)..];
-                var winningNumbers = Parse(winningNumberBuffer, ref winningNumberRemaining);
-                var numbers = Parse(numberBuffer, ref numberRemaining);
+                var winningNumberRemaining = lines[i].AsSpan()[(colon + 1)..pipe];
+                var numberRemaining = lines[i].AsSpan()[(pipe + 1)..];
+                var winningNumbers = Parse(winningNumberBuffer, winningNumberRemaining);
+                var numbers = Parse(numberBuffer,  numberRemaining);
 
                 int numberOfWins = 0;
                 for (int x = 0; x < numbers.Length; x++)
@@ -45,13 +41,16 @@ namespace AdventOfCode.Days
                     sum += 1 << (numberOfWins - 1);
                 }
             }
-            Console.WriteLine("Day 4 Part 1: " + sum);
+            return sum;
         }
 
-        public void RunPart2()
+        public override int RunPart2()
         {
-            int[] winningNumberBuffer = new int[100];
-            int[] numberBuffer = new int[100];
+            Span<int> winningNumberBuffer = new int[100];
+            Span<int> numberBuffer = new int[100];
+
+            var lines = Lines;
+
             int[] counts = new int[lines.Length];
 
             for (int i = 0; i < counts.Length; i++)
@@ -62,11 +61,11 @@ namespace AdventOfCode.Days
             for (int i = 0; i < lines.Length; i++)
             {
                 int colon = lines[i].IndexOf(':');
-                int pipe = lines[i].IndexOf('|');
-                var winningNumberRemaining = ((ReadOnlySpan<char>)lines[i])[(colon + 1)..pipe];
-                var numberRemaining = ((ReadOnlySpan<char>)lines[i])[(pipe + 1)..];
-                var winningNumbers = Parse(winningNumberBuffer, ref winningNumberRemaining);
-                var numbers = Parse(numberBuffer, ref numberRemaining);
+                int pipe = lines[i].IndexOf('|', colon);
+                var winningNumberRemaining = lines[i].AsSpan()[(colon + 1)..pipe];
+                var numberRemaining = lines[i].AsSpan()[(pipe + 1)..];
+                var winningNumbers = Parse(winningNumberBuffer, winningNumberRemaining);
+                var numbers = Parse(numberBuffer, numberRemaining);
 
                 int numberOfWins = 0;
                 for (int x = 0; x < numbers.Length; x++)
@@ -86,10 +85,12 @@ namespace AdventOfCode.Days
                     counts[i + j + 1] += counts[i];
                 }
             }
+
+            return counts.Sum();
             //Console.WriteLine("Day 4 Part 2: " + counts.Sum());
         }
 
-        private static ReadOnlySpan<int> Parse(int[] buffer, ref ReadOnlySpan<char> toParse)
+        private static ReadOnlySpan<int> Parse(Span<int> buffer, ReadOnlySpan<char> toParse)
         {
             int winningNumberBufferCount;
             for (winningNumberBufferCount = 0; toParse.Length > 0; winningNumberBufferCount++)
@@ -112,7 +113,7 @@ namespace AdventOfCode.Days
                 buffer[winningNumberBufferCount] = int.Parse(nextNumber);
             }
 
-            return ((ReadOnlySpan<int>)buffer)[..winningNumberBufferCount];
+            return buffer[..winningNumberBufferCount];
         }
     }
 }

@@ -5,9 +5,9 @@ using System.Threading;
 
 namespace AdventOfCode.Days
 {
-    public class Day2 : IDay
+    public class Day2 : Day
     {
-        public void RunPart1()
+        public override int RunPart1()
         {
             int sum = 0;
             Regex regex = new Regex("^Game (?<gameNumber>[0-9]+):(?:(?<colorList>(?: (?<color>[0-9]+ [A-Za-z]+),?)+);?)+$");
@@ -22,7 +22,7 @@ namespace AdventOfCode.Days
                 ["blue"] = 14,
             };
 
-            foreach (var line in File.ReadAllLines("input/input2.txt"))
+            foreach (var line in Lines)
             {
                 var match = regex.Match(line);
 
@@ -62,10 +62,10 @@ namespace AdventOfCode.Days
                 }
             }
 
-            Console.WriteLine("Day 2 Part 1: " + sum);
+            return sum;
         }
 
-        public void RunPart2()
+        public override int RunPart2()
         {
             int sum = 0;
             Regex regex = new Regex("^Game (?<gameNumber>[0-9]+):(?:(?<colorList>(?: (?<color>[0-9]+ [A-Za-z]+),?)+);?)+$");
@@ -73,7 +73,7 @@ namespace AdventOfCode.Days
 
             Span<Range> split = stackalloc Range[100];
 
-            foreach (var line in File.ReadAllLines("input/input2.txt"))
+            foreach (var line in Lines)
             {
                 var match = regex.Match(line);
 
@@ -115,7 +115,7 @@ namespace AdventOfCode.Days
                 }
             }
 
-            Console.WriteLine("Day 2 Part 2: " + sum);
+            return sum;
         }
     }
 }
