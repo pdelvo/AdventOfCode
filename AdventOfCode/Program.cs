@@ -13,6 +13,8 @@ namespace AdventOfCode
             var day = new Day4();
 
             day.RunPart1();
+
+            // Run once for JIT compilation, not needed for AOT compile
             day.RunPart2();
             var watch = System.Diagnostics.Stopwatch.StartNew();
             day.RunPart2();
