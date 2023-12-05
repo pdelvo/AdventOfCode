@@ -7,6 +7,8 @@ namespace AdventOfCode.Days
 {
     public class Day4 : Day
     {
+        public override string? Description => "Scratchcards";
+
         public override int RunPart1()
         {
             Span<int> winningNumberBuffer = stackalloc int[100];

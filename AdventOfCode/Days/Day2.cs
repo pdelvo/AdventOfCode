@@ -7,6 +7,7 @@ namespace AdventOfCode.Days
 {
     public class Day2 : Day
     {
+        public override string? Description => "Cube Conundrum";
         public override int RunPart1()
         {
             int sum = 0;

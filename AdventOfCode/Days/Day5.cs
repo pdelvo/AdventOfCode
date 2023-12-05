@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace AdventOfCode.Days
 {
-    public class Day5 : Day
+    public class _Day5 : Day
     {
         public override int RunPart1()
         {

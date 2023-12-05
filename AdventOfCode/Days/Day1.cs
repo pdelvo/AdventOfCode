@@ -9,6 +9,8 @@ namespace AdventOfCode.Days
     public class Day1 : Day
     {
         string[] map = new string [0];
+
+        public override string? Description => "Trebuchet?!";
         public override void Initialize(InstanceDownloader downloader)
         {
             base.Initialize(downloader);

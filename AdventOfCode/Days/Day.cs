@@ -13,10 +13,18 @@ namespace AdventOfCode.Days
     {
         public string[] Lines { get; set; } = new string[0];
 
+        public int Number { get; set; }
+        public string Name { get; set; }
+        public virtual string? Description { get; }
+        public Day()
+        {
+            Number  = int.Parse(GetType().Name.Substring(3));
+            Name = "Day " + Number;
+        }
+
         public virtual void Initialize(InstanceDownloader instanceDownloader)
         {
-            var dayNumber = int.Parse(GetType().Name.Substring(3));
-            Lines = instanceDownloader.GetInstance(dayNumber);
+            Lines = instanceDownloader.GetInstance(Number);
         }
 
         public abstract int RunPart1();

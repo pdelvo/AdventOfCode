@@ -6,9 +6,9 @@ using System.Threading;
 
 namespace AdventOfCode.Days
 {
-    [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
     public class Day3 : Day
     {
+        public override string? Description => "Gear Ratios";
         public override int RunPart1()
         {
             int sum = 0;
