@@ -27,7 +27,7 @@ namespace AdventOfCode.Days
             Lines = instanceDownloader.GetInstance(Number);
         }
 
-        public abstract int RunPart1();
-        public abstract int RunPart2();
+        public abstract string RunPart1();
+        public abstract string RunPart2();
     }
 }

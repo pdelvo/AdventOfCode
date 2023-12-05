@@ -8,7 +8,7 @@ namespace AdventOfCode.Days
     public class Day2 : Day
     {
         public override string? Description => "Cube Conundrum";
-        public override int RunPart1()
+        public override string RunPart1()
         {
             int sum = 0;
             Regex regex = new Regex("^Game (?<gameNumber>[0-9]+):(?:(?<colorList>(?: (?<color>[0-9]+ [A-Za-z]+),?)+);?)+$");
@@ -63,10 +63,10 @@ namespace AdventOfCode.Days
                 }
             }
 
-            return sum;
+            return sum.ToString();
         }
 
-        public override int RunPart2()
+        public override string RunPart2()
         {
             int sum = 0;
             Regex regex = new Regex("^Game (?<gameNumber>[0-9]+):(?:(?<colorList>(?: (?<color>[0-9]+ [A-Za-z]+),?)+);?)+$");
@@ -116,7 +116,7 @@ namespace AdventOfCode.Days
                 }
             }
 
-            return sum;
+            return sum.ToString();
         }
     }
 }

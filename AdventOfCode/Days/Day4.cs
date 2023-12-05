@@ -9,7 +9,7 @@ namespace AdventOfCode.Days
     {
         public override string? Description => "Scratchcards";
 
-        public override int RunPart1()
+        public override string RunPart1()
         {
             Span<int> winningNumberBuffer = stackalloc int[100];
             Span<int> numberBuffer = stackalloc int[100];
@@ -43,13 +43,15 @@ namespace AdventOfCode.Days
                     sum += 1 << (numberOfWins - 1);
                 }
             }
-            return sum;
+            return sum.ToString();
         }
 
-        public override int RunPart2()
+        public override string RunPart2()
         {
             Span<int> winningNumberBuffer = new int[100];
             Span<int> numberBuffer = new int[100];
+
+            int sum = 0;
 
             var lines = Lines;
 
@@ -86,10 +88,11 @@ namespace AdventOfCode.Days
                 {
                     counts[i + j + 1] += counts[i];
                 }
+
+                sum += counts[i];
             }
 
-            return counts.Sum();
-            //Console.WriteLine("Day 4 Part 2: " + counts.Sum());
+            return sum.ToString();
         }
 
         private static ReadOnlySpan<int> Parse(Span<int> buffer, ReadOnlySpan<char> toParse)

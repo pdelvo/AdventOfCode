@@ -9,7 +9,7 @@ namespace AdventOfCode.Days
     public class Day3 : Day
     {
         public override string? Description => "Gear Ratios";
-        public override int RunPart1()
+        public override string RunPart1()
         {
             int sum = 0;
             string[] lines = Lines;
@@ -35,7 +35,7 @@ namespace AdventOfCode.Days
                     }
                 }
             }
-            return sum;
+            return sum.ToString();
         }
 
         private bool IsSurroundedBySymbol(string[] lines, int lineNumber, int lineStart, int length, char? symbol, out List<(int x, int y)> positions)
@@ -81,7 +81,7 @@ namespace AdventOfCode.Days
             return (int.Parse(str[position..]), str.Length - position);
         }
 
-        public override int RunPart2()
+        public override string RunPart2()
         {
             int sum = 0;
             string[] lines = Lines;
@@ -131,7 +131,7 @@ namespace AdventOfCode.Days
 
             sum = result.Values.Sum();
 
-            return sum;
+            return sum.ToString();
         }
     }
 }

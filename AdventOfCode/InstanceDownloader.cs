@@ -31,10 +31,8 @@ namespace AdventOfCode
             var handler = new HttpClientHandler { UseCookies = false };
             adventClient = new HttpClient(handler) { BaseAddress = new Uri("https://adventofcode.com/") };
 
-            var version = new ProductInfoHeaderValue("AdventOfCodeSupport", "2.4.1");
-            var comment = new ProductInfoHeaderValue("(+nuget.org/packages/AdventOfCodeSupport by @Zaneris)");
+            var version = new ProductInfoHeaderValue("pdelvo_custom_instance_downloader", "1.0.0");
             adventClient.DefaultRequestHeaders.UserAgent.Add(version);
-            adventClient.DefaultRequestHeaders.UserAgent.Add(comment);
             adventClient.DefaultRequestHeaders.Add("cookie", $"session={cookie.Trim()}");
         }
 

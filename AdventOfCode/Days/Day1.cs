@@ -8,26 +8,21 @@ namespace AdventOfCode.Days
 {
     public class Day1 : Day
     {
-        string[] map = new string [0];
+        Dictionary<int, (string, int)> data = new Dictionary<int, (string, int)>();
+        Dictionary<int, (string, int)> dataReverse = new Dictionary<int, (string, int)>();
 
         public override string? Description => "Trebuchet?!";
         public override void Initialize(InstanceDownloader downloader)
         {
             base.Initialize(downloader);
-
-            map = ["zero",
-                "one",
-                "two",
-                "three",
-                "four",
-                "five",
-                "six",
-                "seven",
-                "eight",
-                "nine"];
         }
 
-        public override int RunPart1()
+        private int RunHash(int hash, char input)
+        {
+            return ((hash << 8) | (byte)input) & 0xffffff;
+        }
+
+        public override string RunPart1()
         {
             int sum = 0;
 
@@ -56,11 +51,37 @@ namespace AdventOfCode.Days
                 sum += lineValue;
             }
 
-            return sum;
+            return sum.ToString();
         }
 
-        public override int RunPart2()
+        public override string RunPart2()
         {
+            string[] map = ["zero",
+                "one",
+                "two",
+                "three",
+                "four",
+                "five",
+                "six",
+                "seven",
+                "eight",
+                "nine"];
+            data = new Dictionary<int, (string, int)>();
+            dataReverse = new Dictionary<int, (string, int)>();
+
+            for (int i = 0; i < map.Length; i++)
+            {
+                int hash = 0;
+                hash = RunHash(hash, map[i][0]);
+                hash = RunHash(hash, map[i][1]);
+                hash = RunHash(hash, map[i][2]);
+                int hashReverse = 0;
+                hashReverse = RunHash(hash, map[i][2]);
+                hashReverse = RunHash(hash, map[i][1]);
+                hashReverse = RunHash(hash, map[i][0]);
+                data.Add(hash, (map[i], i));
+                dataReverse.Add(hashReverse, (map[i], i));
+            }
             int sum = 0;
             foreach (var line in Lines)
             {
@@ -70,29 +91,30 @@ namespace AdventOfCode.Days
                 sum += 10 * left + right;
             }
 
-            return sum;
+            return sum.ToString();
         }
 
         int GetLeftValue(ReadOnlySpan<char> input)
         {
-            while(input.Length > 0)
+            int hash = 0;
+            for(int i = 0; i < input.Length; i++)
             {
-                if (char.IsDigit(input[0]))
+                if (char.IsDigit(input[i]))
                 {
-                    return input[0] - '0';
+                    return input[i] - '0';
                 }
                 else
                 {
-                    for (int j = 0; j < map.Length; j++)
+                    hash = RunHash(hash, input[i]);
+
+                    if (data.TryGetValue(hash, out var d))
                     {
-                        if (input.StartsWith(map[j]))
+                        if (input[(i - 2)..].StartsWith(d.Item1))
                         {
-                            return j;
+                            return d.Item2;
                         }
                     }
                 }
-
-                input = input[1..];
             }
 
             return -1;
@@ -100,24 +122,25 @@ namespace AdventOfCode.Days
 
         int GetRightValue(ReadOnlySpan<char> input)
         {
-            while (input.Length > 0)
+            int hash = 0;
+            for (int i = input.Length - 1; i >= 0; i--)
             {
-                if (char.IsDigit(input[input.Length - 1]))
+                if (char.IsDigit(input[i]))
                 {
-                    return input[input.Length - 1] - '0';
+                    return input[i] - '0';
                 }
                 else
                 {
-                    for (int j = 0; j < map.Length; j++)
+                    hash = RunHash(hash, input[i]);
+
+                    if (dataReverse.TryGetValue(hash, out var d))
                     {
-                        if (input.EndsWith(map[j]))
+                        if (input[i..].StartsWith(d.Item1))
                         {
-                            return j;
+                            return d.Item2;
                         }
                     }
                 }
-
-                input = input[.. (input.Length - 1)];
             }
 
             return -1;

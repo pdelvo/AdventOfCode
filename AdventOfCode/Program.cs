@@ -11,19 +11,16 @@ namespace AdventOfCode
 {
     public partial class Program
     {
-        static int[] padding;
-        static string[] header = ["Day", "Part 1 result", "Part 1 time", "Part 2 result", "Part 2 time"];
 
         static Program()
         {
             Console.OutputEncoding = Encoding.UTF8;
-            padding = header.Select(x => x.Length).ToArray();
         }
 
         static void Main(string[] args)
         {
             InstanceDownloader instanceDownloader = new InstanceDownloader(2023);
-            List<(string dayText, int? result1, double? time1InUs, int? result2, double? time2InUs)> table = new();
+            List<(string dayText, string? result1, double? time1InUs, string? result2, double? time2InUs)> table = new();
             for (int i = 0; i < Days.Length; i++)
             {
                 var day = Days[i];
@@ -46,7 +43,7 @@ namespace AdventOfCode
 
                 day.Initialize(instanceDownloader);
 
-                (double time1InUs, int result1) = SpeedTest(day.RunPart1);
+                (double time1InUs, string result1) = SpeedTest(day.RunPart1);
 
                 table[i] = table[i] with
                 {
@@ -55,19 +52,19 @@ namespace AdventOfCode
                 };
 
                 RenderTable(table);
-                (double time2InUs, int result2) = SpeedTest(day.RunPart2);
+                (double time2InUs, string result2) = SpeedTest(day.RunPart2);
 
                 table[i] = table[i] with
                 {
                     result2 = result2,
                     time2InUs = time2InUs
                 };
-                //table.AddRow(i + 1, result1, timeInUs1 + " µs", result2, timeInUs2 + " µs");
+
                 RenderTable(table);
             }
         }
 
-        static void RenderTable(List<(string dayText, int? result1, double? time1InUs, int? result2, double? time2InUs)> table)
+        static void RenderTable(List<(string dayText, string? result1, double? time1InUs, string? result2, double? time2InUs)> table)
         {
             var grid = new Grid() { Color = DarkGray };
             var document = new Document(grid);
@@ -99,17 +96,12 @@ namespace AdventOfCode
             ConsoleRenderer.RenderDocument(document);
         }
 
-        static void PrintTableRow(params object[] parts)
-        {
-            Console.WriteLine(string.Join("│", parts.Select((x, i) => x.ToString()!.PadLeft(padding[i]))));
-        }
-
-        static (double timeInUs, int result) SpeedTest(Func<int> method)
+        static (double timeInUs, string result) SpeedTest(Func<string> method)
         {
             // Run once for JIT compilation, not needed for AOT compile
             method();
 
-            int result = 0;
+            string result = "";
 
             Stopwatch sw = Stopwatch.StartNew();
             method();

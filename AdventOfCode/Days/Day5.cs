@@ -7,14 +7,15 @@ namespace AdventOfCode.Days
 {
     public class _Day5 : Day
     {
-        public override int RunPart1()
+        public override string? Description => "???";
+        public override string RunPart1()
         {
-            return 0;
+            return "";
         }
 
-        public override int RunPart2()
+        public override string RunPart2()
         {
-            return 0;
+            return "";
         }
     }
 }
