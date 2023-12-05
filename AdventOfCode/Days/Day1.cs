@@ -1,10 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO.MemoryMappedFiles;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using System.Threading;
-
-namespace AdventOfCode.Days
+﻿namespace AdventOfCode.Days
 {
     public class Day1 : Day
     {
@@ -12,11 +6,12 @@ namespace AdventOfCode.Days
         Dictionary<int, (string, int)> dataReverse = new Dictionary<int, (string, int)>();
 
         public override string? Description => "Trebuchet?!";
-        public override void Initialize(InstanceDownloader downloader)
-        {
-            base.Initialize(downloader);
-        }
 
+        /// <summary>
+        /// Sliding 'hash'. Will keep a unique hash of the 3 last characters only.
+        /// </summary>
+        /// <param name="hash">Current hash</param>
+        /// <param name="input">Next character</param>
         private int RunHash(int hash, char input)
         {
             return ((hash << 8) | (byte)input) & 0xffffff;
@@ -56,6 +51,7 @@ namespace AdventOfCode.Days
 
         public override string RunPart2()
         {
+            // Initialize data structures
             string[] map = ["zero",
                 "one",
                 "two",
@@ -66,6 +62,7 @@ namespace AdventOfCode.Days
                 "seven",
                 "eight",
                 "nine"];
+
             data = new Dictionary<int, (string, int)>();
             dataReverse = new Dictionary<int, (string, int)>();
 
@@ -82,6 +79,7 @@ namespace AdventOfCode.Days
                 data.Add(hash, (map[i].Substring(3), i));
                 dataReverse.Add(hashReverse, (map[i].Substring(3), i));
             }
+
             int sum = 0;
             foreach (var line in Lines)
             {
