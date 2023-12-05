@@ -23,8 +23,8 @@ namespace AdventOfCode.Days
                 int pipe = lines[i].IndexOf('|');
                 var winningNumberRemaining = lines[i].AsSpan()[(colon + 1)..pipe];
                 var numberRemaining = lines[i].AsSpan()[(pipe + 1)..];
-                var winningNumbers = Parse(winningNumberBuffer, winningNumberRemaining);
-                var numbers = Parse(numberBuffer,  numberRemaining);
+                var winningNumbers = Tools.ParseNumberList(winningNumberBuffer, winningNumberRemaining);
+                var numbers = Tools.ParseNumberList(numberBuffer,  numberRemaining);
 
                 int numberOfWins = 0;
                 for (int x = 0; x < numbers.Length; x++)
@@ -68,8 +68,8 @@ namespace AdventOfCode.Days
                 int pipe = lines[i].IndexOf('|', colon);
                 var winningNumberRemaining = lines[i].AsSpan()[(colon + 1)..pipe];
                 var numberRemaining = lines[i].AsSpan()[(pipe + 1)..];
-                var winningNumbers = Parse(winningNumberBuffer, winningNumberRemaining);
-                var numbers = Parse(numberBuffer, numberRemaining);
+                var winningNumbers = Tools.ParseNumberList(winningNumberBuffer, winningNumberRemaining);
+                var numbers = Tools.ParseNumberList(numberBuffer, numberRemaining);
 
                 int numberOfWins = 0;
                 for (int x = 0; x < numbers.Length; x++)
@@ -93,32 +93,6 @@ namespace AdventOfCode.Days
             }
 
             return sum.ToString();
-        }
-
-        private static ReadOnlySpan<int> Parse(Span<int> buffer, ReadOnlySpan<char> toParse)
-        {
-            int winningNumberBufferCount;
-            for (winningNumberBufferCount = 0; toParse.Length > 0; winningNumberBufferCount++)
-            {
-                while (toParse.Length > 0 && toParse[0] == ' ')
-                {
-                    toParse = toParse[1..];
-                }
-                int indexOfWhitespace = toParse.IndexOf(' ');
-                ReadOnlySpan<char> nextNumber = toParse;
-                if (indexOfWhitespace >= 0)
-                {
-                    nextNumber = toParse[0..indexOfWhitespace];
-                    toParse = toParse[(indexOfWhitespace + 1)..];
-                }
-                else
-                {
-                    toParse = toParse[nextNumber.Length..];
-                }
-                buffer[winningNumberBufferCount] = int.Parse(nextNumber);
-            }
-
-            return buffer[..winningNumberBufferCount];
         }
     }
 }

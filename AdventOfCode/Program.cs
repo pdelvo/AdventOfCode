@@ -105,7 +105,7 @@ namespace AdventOfCode
 
             Stopwatch sw = Stopwatch.StartNew();
             method();
-            int iterations = (int)(2 / sw.Elapsed.TotalSeconds);
+            int iterations = (int)(0.1 / sw.Elapsed.TotalSeconds);
 
             for (int i = 0; i < iterations; i++)
             {
