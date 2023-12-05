@@ -76,11 +76,11 @@ namespace AdventOfCode.Days
                 hash = RunHash(hash, map[i][1]);
                 hash = RunHash(hash, map[i][2]);
                 int hashReverse = 0;
-                hashReverse = RunHash(hash, map[i][2]);
-                hashReverse = RunHash(hash, map[i][1]);
-                hashReverse = RunHash(hash, map[i][0]);
-                data.Add(hash, (map[i], i));
-                dataReverse.Add(hashReverse, (map[i], i));
+                hashReverse = RunHash(hashReverse, map[i][2]);
+                hashReverse = RunHash(hashReverse, map[i][1]);
+                hashReverse = RunHash(hashReverse, map[i][0]);
+                data.Add(hash, (map[i].Substring(3), i));
+                dataReverse.Add(hashReverse, (map[i].Substring(3), i));
             }
             int sum = 0;
             foreach (var line in Lines)
@@ -109,7 +109,7 @@ namespace AdventOfCode.Days
 
                     if (data.TryGetValue(hash, out var d))
                     {
-                        if (input[(i - 2)..].StartsWith(d.Item1))
+                        if (input[(i + 1)..].StartsWith(d.Item1))
                         {
                             return d.Item2;
                         }
@@ -135,7 +135,7 @@ namespace AdventOfCode.Days
 
                     if (dataReverse.TryGetValue(hash, out var d))
                     {
-                        if (input[i..].StartsWith(d.Item1))
+                        if (input[(i + 3)..].StartsWith(d.Item1))
                         {
                             return d.Item2;
                         }
