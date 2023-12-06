@@ -11,22 +11,50 @@ namespace AdventOfCode.Days
 
         public override string RunPart1()
         {
-            Span<int> winningNumberBuffer = stackalloc int[100];
-            Span<int> numberBuffer = stackalloc int[100];
+            Span<int> winningNumberBuffer = stackalloc int[50];
+            Span<int> numberBuffer = stackalloc int[50];
             int sum = 0;
 
             var lines = Lines;
 
             for (int i = 0; i < lines.Length; i++)
             {
-                int colon = lines[i].IndexOf(':');
-                int pipe = lines[i].IndexOf('|');
-                var winningNumberRemaining = lines[i].AsSpan()[(colon + 1)..pipe];
-                var numberRemaining = lines[i].AsSpan()[(pipe + 1)..];
+                var line = lines[i].AsSpan();
+                int colon = line.IndexOf(':');
+                var winningNumberRemaining = line[(colon + 1)..];
+                int pipe = winningNumberRemaining.IndexOf('|');
+                var numberRemaining = winningNumberRemaining[(pipe + 1)..];
+                winningNumberRemaining = winningNumberRemaining[..pipe];
                 var winningNumbers = Tools.ParseNumberList(winningNumberBuffer, winningNumberRemaining);
-                var numbers = Tools.ParseNumberList(numberBuffer,  numberRemaining);
+                var numbers = Tools.ParseNumberList(numberBuffer, numberRemaining);
 
                 int numberOfWins = 0;
+                // Alternative way which is slower
+                //winningNumbers.Sort();
+                //numbers.Sort();
+
+                //int winningNumberIndex = 0;
+                //int numberIndex = 0;
+                //while  (winningNumberIndex < winningNumbers.Length && numberIndex < numbers.Length)
+                //{
+                //    int number = numbers[numberIndex];
+                //    int winningNumber = winningNumbers[winningNumberIndex];
+
+                //    if (number == winningNumber)
+                //    {
+                //        numberOfWins++;
+                //        numberIndex++;
+                //        winningNumberIndex++;
+                //    }
+                //    else if (number < winningNumber)
+                //    {
+                //        numberIndex++;
+                //    }
+                //    else
+                //    {
+                //        winningNumberIndex++;
+                //    }
+                //}
                 for (int x = 0; x < numbers.Length; x++)
                 {
                     for (int y = 0; y < winningNumbers.Length; y++)
@@ -48,8 +76,8 @@ namespace AdventOfCode.Days
 
         public override string RunPart2()
         {
-            Span<int> winningNumberBuffer = new int[100];
-            Span<int> numberBuffer = new int[100];
+            Span<int> winningNumberBuffer = new int[50];
+            Span<int> numberBuffer = new int[50];
 
             int sum = 0;
 
@@ -64,10 +92,12 @@ namespace AdventOfCode.Days
 
             for (int i = 0; i < lines.Length; i++)
             {
-                int colon = lines[i].IndexOf(':');
-                int pipe = lines[i].IndexOf('|', colon);
-                var winningNumberRemaining = lines[i].AsSpan()[(colon + 1)..pipe];
-                var numberRemaining = lines[i].AsSpan()[(pipe + 1)..];
+                var line = lines[i].AsSpan();
+                int colon = line.IndexOf(':');
+                var winningNumberRemaining = line[(colon + 1)..];
+                int pipe = winningNumberRemaining.IndexOf('|');
+                var numberRemaining = winningNumberRemaining[(pipe + 1)..];
+                winningNumberRemaining = winningNumberRemaining[..pipe];
                 var winningNumbers = Tools.ParseNumberList(winningNumberBuffer, winningNumberRemaining);
                 var numbers = Tools.ParseNumberList(numberBuffer, numberRemaining);
 
