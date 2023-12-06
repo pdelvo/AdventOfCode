@@ -38,9 +38,11 @@ namespace AdventOfCode.Days
             return sum.ToString();
         }
 
+        List<(int x, int y)> positions = new List<(int x, int y)>();
         private bool IsSurroundedBySymbol(string[] lines, int lineNumber, int lineStart, int length, char? symbol, out List<(int x, int y)> positions)
         {
-            positions = new List<(int x, int y)>();
+            positions = this.positions;
+            this.positions.Clear();
 
             for (int i = lineNumber - 1; i <= lineNumber + 1; i++)
             {
@@ -101,15 +103,15 @@ namespace AdventOfCode.Days
                         {
                             foreach (var position in positions)
                             {
-                                if(gears.ContainsKey(position))
+                                if(gears.TryGetValue(position, out var gear))
                                 {
-                                    if (gears[position] == -1)
+                                    if (gear == -1)
                                     {
                                         result[position] = 0;
                                     }
                                     else
                                     {
-                                        result[position] = gears[position] * partNumber;
+                                        result[position] = gear * partNumber;
                                         gears[position] = -1;
                                     }
                                 }
