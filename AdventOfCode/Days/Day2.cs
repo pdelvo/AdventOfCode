@@ -11,55 +11,63 @@ namespace AdventOfCode.Days
         public override string RunPart1()
         {
             int sum = 0;
-            Regex regex = new Regex("^Game (?<gameNumber>[0-9]+):(?:(?<colorList>(?: (?<color>[0-9]+ [A-Za-z]+),?)+);?)+$");
-            Regex colorSplitRegex = new Regex("(?<count>[0-9]+) (?<color>[A-Za-z]+)");
 
             Span<Range> split = stackalloc Range[100];
 
-            Dictionary<string, int> limit = new Dictionary<string, int>()
+            Dictionary<char, int> limit = new Dictionary<char, int>()
             {
-                ["red"] = 12,
-                ["green"] = 13,
-                ["blue"] = 14,
+                ['r'] = 12,
+                ['g'] = 13,
+                ['b'] = 14,
             };
 
             foreach (var line in Lines)
             {
-                var match = regex.Match(line);
+                int colon = line.IndexOf(':');
+                var after = line.AsSpan()[(colon + 1)..];
+                int gameId = int.Parse(line.AsSpan()[5..colon]);
+                bool success = true;
 
-                if (match.Success)
+
+                while (after.Length > 0)
                 {
-                    int gameId = int.Parse(match.Groups["gameNumber"].ValueSpan);
-                    bool success = true;
-
-                    foreach (Capture capture in match.Groups["colorList"].Captures)
+                    int index = after.IndexOf(";");
+                    if (index == -1)
                     {
-                        var colorList = capture.ValueSpan;
+                        index = after.Length;
+                    }
 
-                        int splitCount = colorList.Split(split, ',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.RemoveEmptyEntries);
+                    var colorList = after[..index];
 
-                        var splitPart = split[..splitCount];
-                        foreach (var part in splitPart)
+                    int splitCount = colorList.Split(split, ',');
+
+                    var splitPart = split[..splitCount];
+                    foreach (var part in splitPart)
+                    {
+                        var text = colorList[part].Trim();
+
+                        int whiteSpace = text.IndexOf(' ');
+
+                        int count = int.Parse(text[..whiteSpace]);
+                        var colorChar = text[(whiteSpace + 1)];
+
+                        if (limit[colorChar] < count)
                         {
-                            var text = colorList[part].Trim();
-
-                            int whiteSpace = text.IndexOf(' ');
-
-                            int count = int.Parse(text[..whiteSpace]);
-                            var color = text[(whiteSpace + 1)..];
-
-                            if (limit[color.ToString()] < count)
-                            {
-                                success = false;
-                                break;
-                            }
+                            success = false;
+                            break;
                         }
                     }
 
-                    if (success)
+                    if (index + 1 > after.Length)
                     {
-                        sum += gameId;
+                        break;
                     }
+                    after = after[(index + 1)..];
+                }
+
+                if (success)
+                {
+                    sum += gameId;
                 }
             }
 
@@ -69,51 +77,58 @@ namespace AdventOfCode.Days
         public override string RunPart2()
         {
             int sum = 0;
-            Regex regex = new Regex("^Game (?<gameNumber>[0-9]+):(?:(?<colorList>(?: (?<color>[0-9]+ [A-Za-z]+),?)+);?)+$");
-            Regex colorSplitRegex = new Regex("(?<count>[0-9]+) (?<color>[A-Za-z]+)");
 
             Span<Range> split = stackalloc Range[100];
 
             foreach (var line in Lines)
             {
-                var match = regex.Match(line);
+                int colon = line.IndexOf(':');
+                var after = line.AsSpan()[(colon + 1)..];
+                int gameId = int.Parse(line.AsSpan()[5..colon]);
 
-                Dictionary<string, int> counter = new Dictionary<string, int>()
+                Dictionary<char, int> counter = new Dictionary<char, int>()
                 {
-                    ["red"] = 0,
-                    ["green"] = 0,
-                    ["blue"] = 0,
+                    ['r'] = 0,
+                    ['g'] = 0,
+                    ['b'] = 0,
                 };
 
-                if (match.Success)
+                while (after.Length > 0)
                 {
-                    int gameId = int.Parse(match.Groups["gameNumber"].ValueSpan);
-
-                    foreach (Capture capture in match.Groups["colorList"].Captures)
+                    int index = after.IndexOf(";");
+                    if (index == -1)
                     {
-                        var colorList = capture.ValueSpan;
+                        index = after.Length;
+                    }
 
-                        int splitCount = colorList.Split(split, ',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.RemoveEmptyEntries);
+                    var colorList = after[..index];
 
-                        var splitPart = split[..splitCount];
-                        foreach (var part in splitPart)
+                    int splitCount = colorList.Split(split, ',', StringSplitOptions.RemoveEmptyEntries);
+
+                    var splitPart = split[..splitCount];
+                    foreach (var part in splitPart)
+                    {
+                        var text = colorList[part].Trim();
+
+                        int whiteSpace = text.IndexOf(' ');
+
+                        int count = int.Parse(text[..whiteSpace]);
+                        var colorChar = text[(whiteSpace + 1)];
+
+                        if (counter[colorChar] < count)
                         {
-                            var text = colorList[part].Trim();
-
-                            int whiteSpace = text.IndexOf(' ');
-
-                            int count = int.Parse(text[..whiteSpace]);
-                            var color = text[(whiteSpace + 1)..];
-
-                            if (counter[color.ToString()] < count)
-                            {
-                                counter[color.ToString()] = count;
-                            }
+                            counter[colorChar] = count;
                         }
                     }
-                    int product = counter.Values.Aggregate((x, y) => x * y);
-                    sum += product;
+
+                    if (index + 1 > after.Length)
+                    {
+                        break;
+                    }
+                    after = after[(index + 1)..];
                 }
+                int product = counter.Values.Aggregate((x, y) => x * y);
+                sum += product;
             }
 
             return sum.ToString();

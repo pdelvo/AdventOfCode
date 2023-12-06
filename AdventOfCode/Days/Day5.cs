@@ -63,22 +63,10 @@ namespace AdventOfCode.Days
 
                 maps.Add(map);
             }
-            long[] assertIn = [84, 84, 84, 77, 45, 46, 46];
 
             for (int j = 0; j < maps.Count; j++)
             {
                 ranges = GetNextRanges(ranges, maps[j]);
-
-                bool success = false;
-                for (int i = 0; i < ranges.Length; i++)
-                {
-                    success |= ranges[i].Contains(assertIn[j]);
-                }
-
-                if (!success)
-                {
-                    Debugger.Break();
-                }
             }
 
             long min = long.MaxValue;
@@ -98,12 +86,10 @@ namespace AdventOfCode.Days
         {
             List<LongRange> result = new List<LongRange>();
 
-            int currentMapperIndex = 0;
-
             for (int i = 0; i < input.Length; i++)
             {
                 var currentRange = input[i];
-                currentMapperIndex = 0;
+                int currentMapperIndex = 0;
                 while (true)
                 {
                     if (currentMapperIndex == mapper.Count)
