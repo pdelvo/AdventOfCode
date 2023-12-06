@@ -1,13 +1,11 @@
-﻿using Alba.CsConsoleFormat;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AdventOfCode.Days
+namespace AdventOfCodeLib.Days
 {
     public abstract class Day
     {

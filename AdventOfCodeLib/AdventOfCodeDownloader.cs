@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 
-namespace AdventOfCode
+namespace AdventOfCodeLib
 {
     public class AdventOfCodeDownloader : IInstanceProvider
     {
@@ -31,7 +31,7 @@ namespace AdventOfCode
             var handler = new HttpClientHandler { UseCookies = false };
             adventClient = new HttpClient(handler) { BaseAddress = new Uri("https://adventofcode.com/") };
 
-            var version = new ProductInfoHeaderValue("pdelvo_custom_instance_downloader", "1.0.0");
+            var version = new ProductInfoHeaderValue("ddelvo_custom_instance_downloader", "1.0.0");
             adventClient.DefaultRequestHeaders.UserAgent.Add(version);
             adventClient.DefaultRequestHeaders.Add("cookie", $"session={cookie.Trim()}");
         }

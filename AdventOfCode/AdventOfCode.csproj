@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-	  <ProjectReference Include="..\AdventOfCodeGenerator\AdventOfCodeGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+	  <ProjectReference Include="..\AdventOfCodeLib\AdventOfCodeLib.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿using AdventOfCode.Days;
+﻿using AdventOfCodeLib;
 
 using Alba.CsConsoleFormat;
 

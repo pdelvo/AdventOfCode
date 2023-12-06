@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 
-namespace AdventOfCode.Days
+namespace AdventOfCodeLib.Days
 {
     public class Day2 : Day
     {

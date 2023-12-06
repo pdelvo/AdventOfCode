@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 
-namespace AdventOfCode.Days
+namespace AdventOfCodeLib.Days
 {
     public class Day4 : Day
     {
@@ -80,11 +80,11 @@ namespace AdventOfCode.Days
             Span<int> winningNumberBuffer = new int[50];
             Span<int> numberBuffer = new int[50];
 
-            BigInteger sum = 0;
+            long sum = 0;
 
             var lines = Lines;
 
-            BigInteger[] counts = new BigInteger[lines.Length];
+            long[] counts = new long[lines.Length];
 
             for (int i = 0; i < counts.Length; i++)
             {
@@ -131,7 +131,7 @@ namespace AdventOfCode.Days
                 counts[i] = 0;
             }
 
-            return BigInteger.Log10(sum).ToString();
+            return sum.ToString();
         }
     }
 }

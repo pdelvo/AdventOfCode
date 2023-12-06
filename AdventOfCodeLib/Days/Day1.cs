@@ -1,4 +1,4 @@
-﻿namespace AdventOfCode.Days
+﻿namespace AdventOfCodeLib.Days
 {
     public class Day1 : Day
     {
