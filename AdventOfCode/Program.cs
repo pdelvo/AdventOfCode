@@ -11,6 +11,7 @@ namespace AdventOfCode
 {
     public partial class Program
     {
+        private const double seconds = 1;
 
         static Program()
         {
@@ -19,11 +20,11 @@ namespace AdventOfCode
 
         static void Main(string[] args)
         {
-            InstanceDownloader instanceDownloader = new InstanceDownloader(2023);
+            IInstanceProvider instanceProvider = new AdventOfCodeDownloader(2023);
             List<(string dayText, string? result1, double? time1InUs, string? result2, double? time2InUs)> table = new();
-            for (int i = 0; i < Days.Length; i++)
+            for (int i = 0; i < instanceProvider.Days.Length; i++)
             {
-                var day = Days[i];
+                var day = instanceProvider.Days[i];
 
                 if (day == null)
                 {
@@ -32,16 +33,16 @@ namespace AdventOfCode
                 table.Add((day.Name + (day.Description != null ? ": " + day.Description : ""), null, null, null, null));
                 RenderTable(table);
             }
-            for (int i = 0; i < Days.Length; i++)
+            for (int i = 0; i < instanceProvider.Days.Length; i++)
             {
-                var day = Days[i];
+                var day = instanceProvider.Days[i];
 
                 if (day == null)
                 {
                     continue;
                 }
 
-                day.Initialize(instanceDownloader);
+                day.Initialize(instanceProvider);
 
                 (double time1InUs, string result1) = SpeedTest(day.RunPart1);
 
@@ -99,13 +100,13 @@ namespace AdventOfCode
         static (double timeInUs, string result) SpeedTest(Func<string> method)
         {
             // Run once for JIT compilation, not needed for AOT compile
-            method();
+            //method();
 
             string result = "";
 
             Stopwatch sw = Stopwatch.StartNew();
-            method();
-            int iterations = (int)(2 / sw.Elapsed.TotalSeconds);
+            //();
+            int iterations = 1; // Math.Max((int)(seconds / sw.Elapsed.TotalSeconds), 1);
             sw.Restart();
             for (int i = 0; i < iterations; i++)
             {

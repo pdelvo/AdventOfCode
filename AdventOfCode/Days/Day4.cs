@@ -1,4 +1,5 @@
 ﻿using System.IO.MemoryMappedFiles;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -79,11 +80,11 @@ namespace AdventOfCode.Days
             Span<int> winningNumberBuffer = new int[50];
             Span<int> numberBuffer = new int[50];
 
-            int sum = 0;
+            BigInteger sum = 0;
 
             var lines = Lines;
 
-            int[] counts = new int[lines.Length];
+            BigInteger[] counts = new BigInteger[lines.Length];
 
             for (int i = 0; i < counts.Length; i++)
             {
@@ -116,13 +117,21 @@ namespace AdventOfCode.Days
 
                 for (int j = 0; j < numberOfWins; j++)
                 {
-                    counts[i + j + 1] += counts[i];
+                    if (i + j + 1 < counts.Length)
+                    {
+                        counts[i + j + 1] += counts[i];
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
 
                 sum += counts[i];
+                counts[i] = 0;
             }
 
-            return sum.ToString();
+            return BigInteger.Log10(sum).ToString();
         }
     }
 }

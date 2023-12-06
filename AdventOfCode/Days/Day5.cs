@@ -219,7 +219,6 @@ namespace AdventOfCode.Days
 
         record struct Mapper (LongRange Range, long Offset) : IComparable<Mapper>, IEquatable<Mapper>
         {
-
             public int CompareTo(Mapper other)
             {
                 return Range.Start.CompareTo(other.Range.Start);

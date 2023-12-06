@@ -24,7 +24,7 @@ namespace {mainMethod.ContainingNamespace.ToDisplayString()}
 {{
     public static partial class {mainMethod.ContainingType.Name}
     {{
-        static Day[] Days {{ get; }} = [{daysText}];
+        public static Day[] Days {{ get; }} = [{daysText}];
     }}
 }}
 ";

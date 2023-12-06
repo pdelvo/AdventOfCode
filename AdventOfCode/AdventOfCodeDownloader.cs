@@ -10,7 +10,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace AdventOfCode
 {
-    public class InstanceDownloader
+    public class AdventOfCodeDownloader : IInstanceProvider
     {
         HttpClient adventClient;
 
@@ -18,7 +18,7 @@ namespace AdventOfCode
 
         int year;
 
-        public InstanceDownloader(int year)
+        public AdventOfCodeDownloader(int year)
         {
             this.year = year;
             var builder = new ConfigurationBuilder();

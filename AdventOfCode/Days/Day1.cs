@@ -7,6 +7,18 @@
 
         public override string? Description => "Trebuchet?!";
 
+        // Initialize data structures
+        public static readonly string[] NumberNameList = ["zero",
+            "one",
+            "two",
+            "three",
+            "four",
+            "five",
+            "six",
+            "seven",
+            "eight",
+            "nine"];
+
         /// <summary>
         /// Sliding 'hash'. Will keep a unique hash of the 3 last characters only.
         /// </summary>
@@ -51,33 +63,21 @@
 
         public override string RunPart2()
         {
-            // Initialize data structures
-            string[] map = ["zero",
-                "one",
-                "two",
-                "three",
-                "four",
-                "five",
-                "six",
-                "seven",
-                "eight",
-                "nine"];
-
             data = new Dictionary<int, (string, int)>();
             dataReverse = new Dictionary<int, (string, int)>();
 
-            for (int i = 0; i < map.Length; i++)
+            for (int i = 0; i < NumberNameList.Length; i++)
             {
                 int hash = 0;
-                hash = RunHash(hash, map[i][0]);
-                hash = RunHash(hash, map[i][1]);
-                hash = RunHash(hash, map[i][2]);
+                hash = RunHash(hash, NumberNameList[i][0]);
+                hash = RunHash(hash, NumberNameList[i][1]);
+                hash = RunHash(hash, NumberNameList[i][2]);
                 int hashReverse = 0;
-                hashReverse = RunHash(hashReverse, map[i][2]);
-                hashReverse = RunHash(hashReverse, map[i][1]);
-                hashReverse = RunHash(hashReverse, map[i][0]);
-                data.Add(hash, (map[i].Substring(3), i));
-                dataReverse.Add(hashReverse, (map[i].Substring(3), i));
+                hashReverse = RunHash(hashReverse, NumberNameList[i][2]);
+                hashReverse = RunHash(hashReverse, NumberNameList[i][1]);
+                hashReverse = RunHash(hashReverse, NumberNameList[i][0]);
+                data.Add(hash, (NumberNameList[i].Substring(3), i));
+                dataReverse.Add(hashReverse, (NumberNameList[i].Substring(3), i));
             }
 
             int sum = 0;

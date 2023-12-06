@@ -22,7 +22,7 @@ namespace AdventOfCode.Days
             Name = "Day " + Number;
         }
 
-        public virtual void Initialize(InstanceDownloader instanceDownloader)
+        public virtual void Initialize(IInstanceProvider instanceDownloader)
         {
             Lines = instanceDownloader.GetInstance(Number);
         }
