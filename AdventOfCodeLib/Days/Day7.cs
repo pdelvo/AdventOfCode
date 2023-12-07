@@ -55,15 +55,15 @@ namespace AdventOfCodeLib.Days
             public string Cards { get; set; }
             public int Value { get; set; }
 
-            //public fixed byte NumberCounter[6];
-            public byte[] NumberCounter;
+            public fixed byte NumberCounter[6];
+            //public byte[] NumberCounter;
 
             public Hand(string card, int value)
             {
                 Cards = card;
                 Value = value;
 
-                NumberCounter = new byte[6];
+                //NumberCounter = new byte[6];
 
                 SetNumberCounter();
             }
