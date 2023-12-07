@@ -9,6 +9,10 @@ namespace AdventOfCodeLib.Days
     public class Day6 : Day
     {
         public override string? Description => "Wait For It";
+        public override string TestInput1 => @"Time:      7  15   30
+Distance:  9  40  200";
+        public override string TestOutput1 => "288";
+        public override string TestOutput2 => "71503";
         public override string RunPart1()
         {
             long[] timesBuffer = new long[100];
@@ -30,8 +34,8 @@ namespace AdventOfCodeLib.Days
                 var lowSolution = halfTime - sqrt;
                 var highSolution = halfTime + sqrt;
 
-                var lowRounded = (int)Math.Ceiling(lowSolution);
-                var highRounded = (int)Math.Floor(highSolution);
+                var lowRounded = (int)Math.Floor(lowSolution) + 1;
+                var highRounded = (int)Math.Ceiling(highSolution) - 1;
 
                 var numberOfSolutions = highRounded - lowRounded + 1;
 

@@ -9,6 +9,18 @@ namespace AdventOfCodeLib.Days
     public class Day3 : Day
     {
         public override string? Description => "Gear Ratios";
+        public override string TestInput1 => @"467..114..
+...*......
+..35..633.
+......#...
+617*......
+.....+.58.
+..592.....
+......755.
+...$.*....
+.664.598..";
+        public override string TestOutput1 => "4361";
+        public override string TestOutput2 => "467835";
         public override string RunPart1()
         {
             int sum = 0;

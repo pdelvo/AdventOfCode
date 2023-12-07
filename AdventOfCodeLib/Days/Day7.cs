@@ -10,6 +10,13 @@ namespace AdventOfCodeLib.Days
     public class Day7 : Day
     {
         public override string? Description => "Camel Cards";
+        public override string TestInput1 => @"32T3K 765
+T55J5 684
+KK677 28
+KTJJT 220
+QQQJA 483";
+        public override string TestOutput1 => "6440";
+        public override string TestOutput2 => "5905";
 
         private static bool JokerRule = false;
         public override string RunPart1()

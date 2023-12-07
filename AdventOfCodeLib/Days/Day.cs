@@ -11,6 +11,11 @@ namespace AdventOfCodeLib.Days
     {
         public string[] Lines { get; set; } = new string[0];
 
+        public abstract string TestInput1 { get; }
+        public abstract string TestOutput1 { get; }
+        public virtual string TestInput2 => TestInput1;
+        public abstract string TestOutput2 { get; }
+
         public int Number { get; set; }
         public string Name { get; set; }
         public virtual string? Description { get; }
@@ -27,5 +32,6 @@ namespace AdventOfCodeLib.Days
 
         public abstract string RunPart1();
         public abstract string RunPart2();
+
     }
 }
