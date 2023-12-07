@@ -132,7 +132,6 @@ namespace AdventOfCodeLib.Days
 
             public int CompareTo(Hand other)
             {
-                return 0;
                 int compareResult = GetResultPriority().CompareTo(other.GetResultPriority());
                 for (int i = 0; i <= 5 && compareResult == 0; i++)
                 {
