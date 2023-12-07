@@ -100,13 +100,13 @@ namespace AdventOfCode
         static (double timeInUs, string result) SpeedTest(Func<string> method)
         {
             // Run once for JIT compilation, not needed for AOT compile
-            //method();
+            method();
 
             string result = "";
 
             Stopwatch sw = Stopwatch.StartNew();
-            //();
-            int iterations = 1; // Math.Max((int)(seconds / sw.Elapsed.TotalSeconds), 1);
+            method();
+            int iterations = Math.Max((int)(seconds / sw.Elapsed.TotalSeconds), 1);
             sw.Restart();
             for (int i = 0; i < iterations; i++)
             {
