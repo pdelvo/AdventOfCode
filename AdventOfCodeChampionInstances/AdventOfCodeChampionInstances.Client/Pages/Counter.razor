@@ -1,5 +1,6 @@
 ﻿@page "/counter"
 @rendermode InteractiveAuto
+@inject IJSRuntime JS
 
 <PageTitle>Counter</PageTitle>
 
@@ -8,12 +9,45 @@
 <p role="status">Current count: @currentCount</p>
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<script>
+    window.downloadFileFromStream = async (fileName, contentStreamReference) => {
+      const arrayBuffer = await contentStreamReference.arrayBuffer();
+      const blob = new Blob([arrayBuffer]);
+      const url = URL.createObjectURL(blob);
+      const anchorElement = document.createElement('a');
+      anchorElement.href = url;
+      anchorElement.download = fileName ?? '';
+      anchorElement.click();
+      anchorElement.remove();
+      URL.revokeObjectURL(url);
+    }
+</script>
 
 @code {
     private int currentCount = 0;
 
-    private void IncrementCount()
+    private async Task IncrementCount()
     {
         currentCount++;
+
+
+
+        await DownloadFileFromStream();
+    }
+
+    private Stream GetFileStream()
+    {
+        var binaryData = new byte[1024*1014*1024];
+        var fileStream = new MemoryStream(binaryData);
+        return fileStream;
+    }
+
+    private async Task DownloadFileFromStream()
+    {
+        var fileStream = GetFileStream();
+        var fileName = "log.bin";
+        using var streamRef = new DotNetStreamReference(stream: fileStream);
+
+        await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
     }
 }

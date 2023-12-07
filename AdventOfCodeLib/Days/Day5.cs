@@ -49,7 +49,7 @@ namespace AdventOfCodeLib.Days
 
         public override string RunPart2()
         {
-            ReadOnlySpan<LongRange> ranges = ReadRanges(Lines[0]);
+            Span<LongRange> ranges = ReadRanges(Lines[0]);
 
             ReadOnlySpan<string> text = Lines[2..];
             int skip = 0;
@@ -67,6 +67,9 @@ namespace AdventOfCodeLib.Days
             for (int j = 0; j < maps.Count; j++)
             {
                 ranges = GetNextRanges(ranges, maps[j]);
+                long sizeBefore = ranges.Length;
+                Simplify(ref ranges);
+                Console.WriteLine(sizeBefore + " " + ranges.Length);
             }
 
             long min = long.MaxValue;
@@ -82,7 +85,34 @@ namespace AdventOfCodeLib.Days
             return min.ToString();
         }
 
-        ReadOnlySpan<LongRange> GetNextRanges(ReadOnlySpan<LongRange> input, List<Mapper> mapper)
+        private void Simplify(ref Span<LongRange> ranges)
+        {
+            ranges.Sort();
+
+            long currentStart = ranges[0].Start;
+            long currentEndExclusive = ranges[0].EndExclusive;
+
+            int writePosition = 0;
+
+            for (int i = 1; i < ranges.Length; i++)
+            {
+                if (currentEndExclusive >= ranges[i].Start)
+                {
+                    currentEndExclusive = Math.Max(currentEndExclusive, ranges[i].EndExclusive);
+                }
+                else
+                {
+                    ranges[writePosition++] = LongRange.FromStartEnd(currentStart, currentEndExclusive);
+
+                    currentStart = ranges[i].Start;
+                    currentEndExclusive = ranges[i].EndExclusive;
+                }
+            }
+
+            ranges = ranges[0..writePosition];
+        }
+
+        Span<LongRange> GetNextRanges(ReadOnlySpan<LongRange> input, List<Mapper> mapper)
         {
             List<LongRange> result = new List<LongRange>();
 
@@ -200,7 +230,7 @@ namespace AdventOfCodeLib.Days
             return (result, skippedLines);
         }
 
-        long MapValue(List<Mapper> map, long value)
+        public long MapValue(List<Mapper> map, long value)
         {
             int index = map.BinarySearch(Mapper.FromData(value, 0, 0));
 
@@ -217,7 +247,7 @@ namespace AdventOfCodeLib.Days
             return map[index].Map(value);
         }
 
-        record struct Mapper (LongRange Range, long Offset) : IComparable<Mapper>, IEquatable<Mapper>
+        public record struct Mapper (LongRange Range, long Offset) : IComparable<Mapper>, IEquatable<Mapper>
         {
             public int CompareTo(Mapper other)
             {
@@ -240,11 +270,16 @@ namespace AdventOfCodeLib.Days
             }
         }
 
-        record struct LongRange(long Start, long Length)
+        public record struct LongRange(long Start, long Length) : IComparable<LongRange>
         {
-            public long EndExclusive => Start + Length;
+            public readonly long EndExclusive => Start + Length;
 
             public static LongRange FromStartEnd(long start, long endExclusive) => new LongRange(start, endExclusive - start);
+
+            public int CompareTo(LongRange other)
+            {
+                return Start.CompareTo(other.Start);
+            }
 
             public bool Contains(long value)
             {
@@ -254,6 +289,21 @@ namespace AdventOfCodeLib.Days
             public LongRange FromNewStart(long start)
             {
                 return new LongRange(start, Length - (start - Start));
+            }
+
+            public bool Intersects(LongRange other)
+            {
+                if (other.Start < Start)
+                {
+                    return other.EndExclusive > Start;
+                }
+
+                return Contains(other.Start);
+            }
+
+            public LongRange Offset(long offset)
+            {
+                return new LongRange(Start + offset, Length);
             }
         }
     }

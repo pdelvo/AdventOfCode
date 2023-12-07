@@ -20,7 +20,7 @@ namespace AdventOfCode
 
         static void Main(string[] args)
         {
-            IInstanceProvider instanceProvider = new AdventOfCodeDownloader(2023);
+            IInstanceProvider instanceProvider = new HardInstanceProvider(); //new AdventOfCodeDownloader(2023);
             List<(string dayText, string? result1, double? time1InUs, string? result2, double? time2InUs)> table = new();
             for (int i = 0; i < instanceProvider.Days.Length; i++)
             {
@@ -44,12 +44,19 @@ namespace AdventOfCode
 
                 day.Initialize(instanceProvider);
 
+                table[i] = table[i] with
+                {
+                    result1 = "..."
+                };
+                RenderTable(table);
+
                 (double time1InUs, string result1) = SpeedTest(day.RunPart1);
 
                 table[i] = table[i] with
                 {
                     result1 = result1,
-                    time1InUs = time1InUs
+                    time1InUs = time1InUs,
+                    result2 = "..."
                 };
 
                 RenderTable(table);
