@@ -13,6 +13,7 @@ namespace AdventOfCode
     public partial class Program
     {
         private const double seconds = 1;
+        private const bool Benchmark = true;
 
         static Program()
         {
@@ -148,7 +149,11 @@ namespace AdventOfCode
 
             Stopwatch sw = Stopwatch.StartNew();
             method();
-            int iterations = Math.Max((int)(seconds / sw.Elapsed.TotalSeconds), 1);
+            int iterations = 1;
+            if (Benchmark)
+            {
+                iterations = Math.Max((int)(seconds / sw.Elapsed.TotalSeconds), 1);
+            }
             sw.Restart();
             for (int i = 0; i < iterations; i++)
             {
