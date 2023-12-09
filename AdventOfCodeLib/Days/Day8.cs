@@ -29,8 +29,7 @@ XXX = (XXX, XXX)";
         public override string TestOutput2 => "6";
         public override string RunPart1()
         {
-            Dictionary<int, (int left, int right)> map;
-            var instructions = ReadData(out map);
+            var instructions = ReadData(out Dictionary<int, (int left, int right)> map);
 
             int counter = 0;
 
@@ -57,65 +56,44 @@ XXX = (XXX, XXX)";
 
         public override string RunPart2()
         {
-            Dictionary<int, (int left, int right)> map;
-            var instructions = ReadData(out map).ToArray();
+            var instructions = ReadData(out Dictionary<int, (int left, int right)> map).ToArray();
 
 
             int[] start = map.Keys.Where(x => (x & 0xFF) == 'A').ToArray();
-            long[] counter = new long[start.Length];
+            List<(int name, long distance)>[] counter = new List<(int name, long distance)>[start.Length];
 
             Parallel.For(0, start.Length, i=>
             {
-                counter[i] = GetLength(map, instructions, start[i]);
+                counter[i] = AnalyzeRoute(map, instructions, start[i]);
             });
 
-            long totalCounter = counter[0];
+            var list = counter[0];
+
+            var totalCounter = list[0].distance;
             for (int i = 1; i < counter.Length; i++)
             {
-                totalCounter = LeastCommonMultiple(totalCounter, counter[i]);
+                totalCounter = AOCMath.LeastCommonMultiple(totalCounter, counter[i][0].distance);
             }
 
             return totalCounter.ToString();
         }
 
-        private long LeastCommonMultiple(long a, long b)
+        private static List<(int name, long distance)> AnalyzeRoute(Dictionary<int, (int left, int right)> map, ReadOnlySpan<char> instructions, int start)
         {
-            return a * (b / GreatestCommonDivisor(a, b));
-        }
-
-        private (long min, long max) MinMax(long a, long b)
-        {
-            if (a < b)
-            {
-                return (a, b);
-            }
-
-            return (b, a);
-        }
-
-        private long GreatestCommonDivisor(long a, long b)
-        {
-            while (true)
-            {
-                (a, b) = MinMax(a, b);
-
-                if (a == 0)
-                {
-                    return b;
-                }
-
-                b = b % a;
-            }
-        }
-
-        private static long GetLength(Dictionary<int, (int left, int right)> map, ReadOnlySpan<char> instructions, int start)
-        {
+            List<(int name, long distance)> endPoints = [];
             int counter = 0;
             while (true)
             {
                 if ((start & 0xFF) == 'Z')
                 {
-                    return counter;
+                    if (endPoints.Count > 0 && endPoints[0].name == start)
+                    {
+                        return endPoints;
+                    }
+                    else
+                    {
+                        endPoints.Add((start, counter));
+                    }
                 }
 
                 var instruction = instructions[counter++ % instructions.Length];
@@ -134,7 +112,7 @@ XXX = (XXX, XXX)";
 
         private ReadOnlySpan<char> ReadData(out Dictionary<int, (int, int)> map)
         {
-            map = new Dictionary<int, (int, int)>();
+            map = [];
 
             for (int i = 2; i < Lines.Length; i++)
             {
@@ -148,7 +126,7 @@ XXX = (XXX, XXX)";
             return Lines[0];
         }
 
-        private int NodeNameToInt(ReadOnlySpan<char> nodeName)
+        private static int NodeNameToInt(ReadOnlySpan<char> nodeName)
         {
             return (nodeName[0] << 16) | (nodeName[1] << 8) | nodeName[2];
         }

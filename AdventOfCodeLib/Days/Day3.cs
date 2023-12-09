@@ -50,7 +50,7 @@ namespace AdventOfCodeLib.Days
             return sum.ToString();
         }
 
-        List<(int x, int y)> positions = new List<(int x, int y)>();
+        readonly List<(int x, int y)> positions = [];
         private bool IsSurroundedBySymbol(string[] lines, int lineNumber, int lineStart, int length, char? symbol, out List<(int x, int y)> positions)
         {
             positions = this.positions;
@@ -70,7 +70,7 @@ namespace AdventOfCodeLib.Days
             return positions.Count > 0;
         }
 
-        private bool IsSymbolSafe(string[] lines, int lineNumber, int position, char? symbol)
+        private static bool IsSymbolSafe(string[] lines, int lineNumber, int position, char? symbol)
         {
             if (lineNumber < 0 || lineNumber >= lines.Length || position < 0 || position >= lines[lineNumber].Length)
             {
@@ -82,7 +82,7 @@ namespace AdventOfCodeLib.Days
             return !char.IsDigit(x) && (symbol == null ? x != '.' : x == symbol);
         }
 
-        private (int number, int length) ParseIntAtPosition(string str, int position)
+        private static (int number, int length) ParseIntAtPosition(string str, int position)
         {
             for (int end = position; end < str.Length; end++)
             {
@@ -100,8 +100,8 @@ namespace AdventOfCodeLib.Days
             int sum = 0;
             string[] lines = Lines;
 
-            Dictionary<(int x, int y), int> gears = new Dictionary<(int x, int y), int>();
-            Dictionary<(int x, int y), int> result = new Dictionary<(int x, int y), int>();
+            Dictionary<(int x, int y), int> gears = [];
+            Dictionary<(int x, int y), int> result = [];
 
             for (int i = 0; i < lines.Length; i++)
             {

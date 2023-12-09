@@ -12,11 +12,11 @@ namespace AdventOfCodeLib
 {
     public class AdventOfCodeDownloader : IInstanceProvider
     {
-        HttpClient adventClient;
+        readonly HttpClient adventClient;
 
-        Dictionary<int, WeakReference<string[]>> cache = new Dictionary<int, WeakReference<string[]>>();
+        readonly Dictionary<int, WeakReference<string[]>> cache = [];
 
-        int year;
+        readonly int year;
 
         public AdventOfCodeDownloader(int year)
         {

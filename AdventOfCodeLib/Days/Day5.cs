@@ -48,10 +48,10 @@ humidity-to-location map:
         {
             var seeds = ReadList(Lines[0]);
 
-            ReadOnlySpan<string> text = Lines[2..];
+            ReadOnlySpan<string> text = Lines.AsSpan()[2..];
             int skip = 0;
 
-            List<List<Mapper>> maps = new List<List<Mapper>>();
+            List<List<Mapper>> maps = [];
 
             while (text.Length > 0)
             {
@@ -86,10 +86,10 @@ humidity-to-location map:
         {
             ReadOnlySpan<LongRange> ranges = ReadRanges(Lines[0]);
 
-            ReadOnlySpan<string> text = Lines[2..];
+            ReadOnlySpan<string> text = Lines.AsSpan()[2..];
             int skip = 0;
 
-            List<List<Mapper>> maps = new List<List<Mapper>>();
+            List<List<Mapper>> maps = [];
 
             while (text.Length > 0)
             {
@@ -119,7 +119,7 @@ humidity-to-location map:
 
         ReadOnlySpan<LongRange> GetNextRanges(ReadOnlySpan<LongRange> input, List<Mapper> mapper)
         {
-            List<LongRange> result = new List<LongRange>();
+            List<LongRange> result = [];
 
             for (int i = 0; i < input.Length; i++)
             {
@@ -181,14 +181,14 @@ humidity-to-location map:
             return result.ToArray();
         }
 
-        Span<long> ReadList(string text)
+        static Span<long> ReadList(string text)
         {
             long[] seedList = new long[text.Length];
 
             return Tools.ParseNumberList(seedList, text.AsSpan()[6..]);
         }
 
-        Span<LongRange> ReadRanges(string text)
+        static Span<LongRange> ReadRanges(string text)
         {
             long[] rangeList = new long[text.Length];
 
@@ -204,7 +204,7 @@ humidity-to-location map:
             return ranges;
         }
 
-        (List<Mapper> result, int skippedLines) ReadMap(ReadOnlySpan<string> text)
+        static (List<Mapper> result, int skippedLines) ReadMap(ReadOnlySpan<string> text)
         {
             int skippedLines = 0;
             while (!text[0].Contains(':'))
@@ -217,7 +217,7 @@ humidity-to-location map:
 
             long[] parsedLine = new long[3];
 
-            List<Mapper> result = new List<Mapper>(text.Length);
+            List<Mapper> result = new(text.Length);
 
             for (int i = 0; text.Length > 0 && text[0].Length > 0; i++)
             {
@@ -235,7 +235,7 @@ humidity-to-location map:
             return (result, skippedLines);
         }
 
-        long MapValue(List<Mapper> map, long value)
+        static long MapValue(List<Mapper> map, long value)
         {
             int index = map.BinarySearch(Mapper.FromData(value, 0, 0));
 
@@ -254,7 +254,7 @@ humidity-to-location map:
 
         record struct Mapper (LongRange Range, long Offset) : IComparable<Mapper>, IEquatable<Mapper>
         {
-            public int CompareTo(Mapper other)
+            public readonly int CompareTo(Mapper other)
             {
                 return Range.Start.CompareTo(other.Range.Start);
             }
@@ -264,7 +264,7 @@ humidity-to-location map:
                 return new Mapper(new LongRange(fromStart, length), toStart - fromStart);
             }
 
-            public long Map(long input)
+            public readonly long Map(long input)
             {
                 if (Range.Contains(input))
                 {
@@ -277,16 +277,16 @@ humidity-to-location map:
 
         record struct LongRange(long Start, long Length)
         {
-            public long EndExclusive => Start + Length;
+            public readonly long EndExclusive => Start + Length;
 
-            public static LongRange FromStartEnd(long start, long endExclusive) => new LongRange(start, endExclusive - start);
+            public static LongRange FromStartEnd(long start, long endExclusive) => new(start, endExclusive - start);
 
-            public bool Contains(long value)
+            public readonly bool Contains(long value)
             {
                 return value >= Start && value < Start + Length;
             }
 
-            public LongRange FromNewStart(long start)
+            public readonly LongRange FromNewStart(long start)
             {
                 return new LongRange(start, Length - (start - Start));
             }

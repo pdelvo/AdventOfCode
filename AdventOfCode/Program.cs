@@ -1,4 +1,5 @@
 ﻿using AdventOfCodeLib;
+using AdventOfCodeLib.Days;
 
 using Alba.CsConsoleFormat;
 
@@ -22,8 +23,8 @@ namespace AdventOfCode
 
         static void Main(string[] args)
         {
-            IInstanceProvider instanceProvider = new AdventOfCodeDownloader(2023);
-            List<(string dayText, string? test1, string? result1, double? time1InUs, string? test2, string? result2, double? time2InUs)> table = new();
+            IInstanceProvider instanceProvider = new HardInstanceProvider(); // new AdventOfCodeDownloader(2023);
+            List<(string dayText, string? test1, string? result1, double? time1InUs, string? test2, string? result2, double? time2InUs)> table = [];
             for (int i = 0; i < instanceProvider.Days.Length; i++)
             {
                 var day = instanceProvider.Days[i];

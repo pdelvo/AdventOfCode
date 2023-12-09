@@ -2,14 +2,13 @@
 {
     public class Day1 : Day
     {
-        Dictionary<int, (string, int)> data = new Dictionary<int, (string remaining, int value)>();
-        Dictionary<int, (string, int)> dataReverse = new Dictionary<int, (string remaining, int value)>();
+        Dictionary<int, (string, int)> data = [];
+        Dictionary<int, (string, int)> dataReverse = [];
 
         public override string? Description => "Trebuchet?!";
 
         // Initialize data structures
-        public static readonly string[] NumberNameList = [
-            "zero",
+        public static readonly string[] NumberNameList = ["zero",
             "one",
             "two",
             "three",
@@ -40,9 +39,9 @@ zoneight234
         /// </summary>
         /// <param name="hash">Current hash</param>
         /// <param name="input">Next character</param>
-        private int RunHash(int hash, char input)
+        private static int RunHash(int hash, char input)
         {
-            return ((hash << 8) | (byte)input) & 0xff_ff_ff;
+            return ((hash << 8) | (byte)input) & 0xffffff;
         }
 
         public override string RunPart1()
@@ -79,8 +78,8 @@ zoneight234
 
         public override string RunPart2()
         {
-            data = new Dictionary<int, (string, int)>();
-            dataReverse = new Dictionary<int, (string, int)>();
+            data = [];
+            dataReverse = [];
 
             for (int i = 0; i < NumberNameList.Length; i++)
             {
@@ -120,11 +119,12 @@ zoneight234
                 else
                 {
                     hash = RunHash(hash, input[i]);
-                    if (data.TryGetValue(hash, out (string remaining, int value) d))
+
+                    if (data.TryGetValue(hash, out var d))
                     {
-                        if (input[(i + 1)..].StartsWith(d.remaining))
+                        if (input[(i + 1)..].StartsWith(d.Item1))
                         {
-                            return d.value;
+                            return d.Item2;
                         }
                     }
                 }

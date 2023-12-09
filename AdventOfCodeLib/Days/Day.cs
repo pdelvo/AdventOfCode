@@ -9,7 +9,7 @@ namespace AdventOfCodeLib.Days
 {
     public abstract class Day
     {
-        public string[] Lines { get; set; } = new string[0];
+        public string[] Lines { get; set; } = [];
 
         public abstract string TestInput1 { get; }
         public abstract string TestOutput1 { get; }
@@ -21,7 +21,7 @@ namespace AdventOfCodeLib.Days
         public virtual string? Description { get; }
         public Day()
         {
-            Number  = int.Parse(GetType().Name.Substring(3));
+            Number  = int.Parse(GetType().Name[3..]);
             Name = "Day " + Number;
         }
 
