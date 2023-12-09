@@ -34,8 +34,8 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11";
                 int pipe = winningNumberRemaining.IndexOf('|');
                 var numberRemaining = winningNumberRemaining[(pipe + 1)..];
                 winningNumberRemaining = winningNumberRemaining[..pipe];
-                var winningNumbers = Tools.ParseNumberList(winningNumberBuffer, winningNumberRemaining);
-                var numbers = Tools.ParseNumberList(numberBuffer, numberRemaining);
+                var winningNumbers = ParsingHelpers.ParseNumberList(winningNumberBuffer, winningNumberRemaining);
+                var numbers = ParsingHelpers.ParseNumberList(numberBuffer, numberRemaining);
 
                 int numberOfWins = 0;
                 // Alternative way which is slower
@@ -107,8 +107,8 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11";
                 int pipe = winningNumberRemaining.IndexOf('|');
                 var numberRemaining = winningNumberRemaining[(pipe + 1)..];
                 winningNumberRemaining = winningNumberRemaining[..pipe];
-                var winningNumbers = Tools.ParseNumberList(winningNumberBuffer, winningNumberRemaining);
-                var numbers = Tools.ParseNumberList(numberBuffer, numberRemaining);
+                var winningNumbers = ParsingHelpers.ParseNumberList(winningNumberBuffer, winningNumberRemaining);
+                var numbers = ParsingHelpers.ParseNumberList(numberBuffer, numberRemaining);
 
                 int numberOfWins = 0;
                 for (int x = 0; x < numbers.Length; x++)

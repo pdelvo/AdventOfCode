@@ -20,9 +20,9 @@ using AdventOfCodeLib.Days;
 
 namespace AdventOfCodeLib
 {{
-    public partial interface IInstanceProvider
+    public abstract partial class InstanceProvider
     {{
-        public Day[] Days => [{daysText}];
+        public Day[] Days {{ get; }} = [{daysText}];
     }}
 }}
 ";

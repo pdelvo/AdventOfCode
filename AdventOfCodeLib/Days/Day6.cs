@@ -17,8 +17,8 @@ Distance:  9  40  200";
         {
             long[] timesBuffer = new long[100];
             long[] distanceBuffer = new long[100];
-            var times = Tools.ParseNumberList(timesBuffer, Lines[0].AsSpan()["Time: ".Length..]);
-            var distances = Tools.ParseNumberList(distanceBuffer, Lines[1].AsSpan()["Distance: ".Length..]);
+            var times = ParsingHelpers.ParseNumberList(timesBuffer, Lines[0].AsSpan()["Time: ".Length..]);
+            var distances = ParsingHelpers.ParseNumberList(distanceBuffer, Lines[1].AsSpan()["Distance: ".Length..]);
 
             return ComputeSolution(times, distances).ToString();
         }
@@ -51,8 +51,8 @@ Distance:  9  40  200";
             long[] distanceBuffer = new long[100];
             var line0 = Lines[0].AsSpan()["Time: ".Length..].ToString().Replace(" ", "");
             var line1 = Lines[1].AsSpan()["Distance: ".Length..].ToString().Replace(" ", "");
-            var times = Tools.ParseNumberList(timesBuffer, line0);
-            var distances = Tools.ParseNumberList(distanceBuffer, line1);
+            var times = ParsingHelpers.ParseNumberList(timesBuffer, line0);
+            var distances = ParsingHelpers.ParseNumberList(distanceBuffer, line1);
 
             return ComputeSolution(times, distances).ToString();
         }

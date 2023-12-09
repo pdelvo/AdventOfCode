@@ -10,7 +10,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace AdventOfCodeLib
 {
-    public class AdventOfCodeDownloader : IInstanceProvider
+    public class AdventOfCodeDownloader : InstanceProvider
     {
         readonly HttpClient adventClient;
 
@@ -36,7 +36,7 @@ namespace AdventOfCodeLib
             adventClient.DefaultRequestHeaders.Add("cookie", $"session={cookie.Trim()}");
         }
 
-        public string[] GetInstance(int day)
+        public override string[] GetInstance(int day)
         {
             string path = $"input/input{day}.txt";
             if (cache.ContainsKey(day))

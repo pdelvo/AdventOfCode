@@ -185,14 +185,14 @@ humidity-to-location map:
         {
             long[] seedList = new long[text.Length];
 
-            return Tools.ParseNumberList(seedList, text.AsSpan()[6..]);
+            return ParsingHelpers.ParseNumberList(seedList, text.AsSpan()[6..]);
         }
 
         static Span<LongRange> ReadRanges(string text)
         {
             long[] rangeList = new long[text.Length];
 
-            var numbers = Tools.ParseNumberList(rangeList, text.AsSpan()[6..]);
+            var numbers = ParsingHelpers.ParseNumberList(rangeList, text.AsSpan()[6..]);
 
             LongRange[] ranges = new LongRange[numbers.Length / 2];
 
@@ -222,7 +222,7 @@ humidity-to-location map:
             for (int i = 0; text.Length > 0 && text[0].Length > 0; i++)
             {
 
-                Tools.ParseNumberList(parsedLine, text[0]);
+                ParsingHelpers.ParseNumberList(parsedLine, text[0]);
 
                 result.Add(Mapper.FromData(parsedLine[1], parsedLine[0], parsedLine[2]));
 
