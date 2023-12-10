@@ -26,99 +26,83 @@ LJ.LJ";
 .|..||..|.
 .L--JL--J.
 ..........";
+
+        static char[] neighborTypes = ['|', '-', 'L', 'J', '7', 'F'];
+
         public override string TestOutput2 => "4";
         public override string RunPart1()
         {
-            var (counter, _)= WalkPipes();
+            var (counter, _, _, _)= WalkPipes();
 
             return (counter / 2).ToString();
         }
         public override string RunPart2()
         {
-            var (counter, map) = WalkPipes();
+            var (counter, map, start, sKind) = WalkPipes();
 
-            var insideOutsideMap = new bool?[Lines[0].Length, Lines.Length];
-
-            Queue<(int x, int y, bool inside)> toVisit = new Queue<(int x, int y, bool inside)>();
-            HashSet<(int x, int y)> seen = new HashSet<(int x, int y)>();
-
-            for (int x = 0; x < Lines[0].Length; x++)
+            char GetCharAtPositionWithReplacement(int x, int y)
             {
-                PositionSeen(toVisit, seen, map, (x, 0), false);
-                PositionSeen(toVisit, seen, map, (x, Lines.Length - 1), false);
-            }
-            for (int y = 1; y < Lines.Length - 1; y++)
-            {
-                PositionSeen(toVisit, seen, map, (0, y), false);
-                PositionSeen(toVisit, seen, map, (Lines[0].Length - 1, y), false);
-            }
-
-            while(toVisit.Count > 0)
-            {
-                var (x, y, inside) = toVisit.Dequeue();
-                if (!map[x, y])
+                if (start == (x, y))
                 {
-                    insideOutsideMap[x, y] = inside;
-                    PositionSeen(toVisit, seen, map, (x - 1, y), inside);
-                    PositionSeen(toVisit, seen, map, (x, y - 1), inside);
-                    PositionSeen(toVisit, seen, map, (x + 1, y), inside);
-                    PositionSeen(toVisit, seen, map, (x, y + 1), inside);
+                    return sKind;
                 }
-                else
-                {
-                    char? pipePart = GetPosition(x, y);
-                    switch (pipePart)
-                    {
-                        case '|':
-                            MakeDifferent(toVisit, seen, insideOutsideMap, map, (x - 1, y), (x + 1, y));
-                            break;
-                        case '-':
-                            MakeDifferent(toVisit, seen, insideOutsideMap, map, (x, y - 1), (x, y + 1));
-                            break;
-                        case 'L':
-                            MakeDifferent(toVisit, seen, insideOutsideMap, map, (x + 1, y - 1), (x - 1, y));
-                            MakeDifferent(toVisit, seen, insideOutsideMap, map, (x + 1, y - 1), (x, y + 1));
-                            MakeDifferent(toVisit, seen, insideOutsideMap, map, (x + 1, y - 1), (x - 1, y + 1));
-                            break;
-                        case 'J':
-                            MakeDifferent(toVisit, seen, insideOutsideMap, map, (x - 1, y - 1), (x + 1, y));
-                            MakeDifferent(toVisit, seen, insideOutsideMap, map, (x - 1, y - 1), (x, y + 1));
-                            MakeDifferent(toVisit, seen, insideOutsideMap, map, (x - 1, y - 1), (x + 1, y + 1));
-                            break;
-                        case '7':
-                            MakeDifferent(toVisit, seen, insideOutsideMap, map, (x - 1, y + 1), (x + 1, y));
-                            MakeDifferent(toVisit, seen, insideOutsideMap, map, (x - 1, y + 1), (x, y + 1));
-                            MakeDifferent(toVisit, seen, insideOutsideMap, map, (x - 1, y + 1), (x + 1, y + 1));
-                            break;
-                        case 'F':
-                            MakeDifferent(toVisit, seen, insideOutsideMap, map, (x + 1, y + 1), (x - 1, y));
-                            MakeDifferent(toVisit, seen, insideOutsideMap, map, (x + 1, y + 1), (x, y - 1));
-                            MakeDifferent(toVisit, seen, insideOutsideMap, map, (x + 1, y + 1), (x - 1, y - 1));
-                            break;
-                        case 'S':
-                            break;
-                        default: throw new Exception("Pipe part expected");
-                    }
-                }
+                return Lines[y][x];
             }
-
-            string testString = FormatInsideOutsideMap(insideOutsideMap, map);
-            Console.WriteLine(testString);
 
             int insideCounter = 0;
 
-            for (int x = 0; x < Lines[0].Length; x++)
+
+            for (var y = 0; y < Lines.Length; y++)
             {
-                for (int y = 0; y < Lines.Length; y++)
+                bool inside = false;
+
+                for (int x = 0; x < Lines[0].Length; x++)
                 {
-                    if (insideOutsideMap[x, y] is true && map[x, y] is false)
+                    if (map[x, y])
                     {
-                        insideCounter++;
+                        if (GetCharAtPositionWithReplacement(x, y) == '|')
+                        {
+                            inside = !inside;
+                        }
+                        else if (GetCharAtPositionWithReplacement(x, y) == 'F')
+                        {
+                            x++;
+                            while (GetCharAtPositionWithReplacement(x, y) == '-')
+                            {
+                                x++;
+                            }
+
+                            if (GetCharAtPositionWithReplacement(x, y) == 'J')
+                            {
+                                inside = !inside;
+                            }
+                        }
+                        else if (GetCharAtPositionWithReplacement(x, y) == 'L')
+                        {
+                            x++;
+                            while (GetCharAtPositionWithReplacement(x, y) == '-')
+                            {
+                                x++;
+                            }
+
+                            if (GetCharAtPositionWithReplacement(x, y) == '7')
+                            {
+                                inside = !inside;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (inside)
+                        {
+                            insideCounter++;
+                        }
                     }
                 }
             }
 
             return insideCounter.ToString();
+
         }
 
         private string FormatInsideOutsideMap(bool?[,] insideOutsideMap, bool[,] map)
@@ -184,13 +168,14 @@ LJ.LJ";
             return position.x >= 0 && position.y >= 0 && position.x < Lines[0].Length && position.y < Lines.Length;
         }
 
-        private (int, bool[,] map) WalkPipes()
+        private (int, bool[,] map, (int x, int y) start, char SKind) WalkPipes()
         {
             var map = new bool[Lines[0].Length, Lines.Length];
             var (startX, startY) = FindStart();
             map[startX, startY] = true;
 
-            var neighbor = FindPositionAfterStart((startX, startY));
+            var startNeighbors = FindPositionsAfterStart((startX, startY));
+            var neighbor = startNeighbors[0];
             map[neighbor.x, neighbor.y] = true;
             var previousNeighbor = (startX, startY);
             int counter = 1;
@@ -203,41 +188,55 @@ LJ.LJ";
                 previousNeighbor = oldNeighbor;
                 counter++;
             }
+            char sKind = ' ';
+            // Replace start by what it should be
+            foreach (var neighborType in neighborTypes)
+            {
+                Lines[startY] = ReplaceAt(Lines[startY], startX, 1, neighborType.ToString());
 
-            return (counter, map);
+                var (neighbor1, neighbor2) = FindNeighbors((startX, startY))!.Value;
+
+                if (startNeighbors.Contains(neighbor1) && startNeighbors.Contains(neighbor2))
+                {
+                    sKind = neighborType;
+                    Lines[startY] = ReplaceAt(Lines[startY], startX, 1, "S");
+                    break;
+                }
+            }
+
+            return (counter, map, (startX, startY),sKind);
         }
 
-        private (int x, int y) FindPositionAfterStart((int x, int y) start)
+        private (int x, int y)[] FindPositionsAfterStart((int x, int y) start)
         {
+            (int x, int y)[] neighbors = new (int x, int y)[2];
             var neighbor = (start.x - 1, start.y);
+            int counter = 0;
 
             if (FindNextPosition(neighbor, start) != null)
             {
-                return neighbor;
+                neighbors[counter++] = neighbor;
             }
 
             neighbor = (start.x + 1, start.y);
 
             if (FindNextPosition(neighbor, start) != null)
             {
-                return neighbor;
+                neighbors[counter++] = neighbor;
             }
             neighbor = (start.x, start.y - 1);
 
             if (FindNextPosition(neighbor, start) != null)
             {
-                return neighbor;
+                neighbors[counter++] = neighbor;
             }
-
-            // Should never be reached from here
-            neighbor = (start.x - 1, start.y + 1);
+            neighbor = (start.x, start.y + 1);
 
             if (FindNextPosition(neighbor, start) != null)
             {
-                return neighbor;
+                neighbors[counter++] = neighbor;
             }
-
-            throw new Exception("Could not find neighbor of start");
+            return neighbors;
         }
 
         private (int x, int y)? FindNextPosition((int x, int y) currentPosition, (int x, int y) previousPosition)
@@ -310,6 +309,17 @@ LJ.LJ";
             }
 
             return null;
+        }
+
+        public static string ReplaceAt(string str, int index, int length, string replace)
+        {
+            return string.Create(str.Length - length + replace.Length, (str, index, length, replace),
+                (span, state) =>
+                {
+                    state.str.AsSpan().Slice(0, state.index).CopyTo(span);
+                    state.replace.AsSpan().CopyTo(span.Slice(state.index));
+                    state.str.AsSpan().Slice(state.index + state.length).CopyTo(span.Slice(state.index + state.replace.Length));
+                });
         }
     }
 }
