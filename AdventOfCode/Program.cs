@@ -14,7 +14,7 @@ namespace AdventOfCode
     public partial class Program
     {
         private const double seconds = 1;
-        private const bool Benchmark = true;
+        private const bool Benchmark = false;
 
         static Program()
         {
