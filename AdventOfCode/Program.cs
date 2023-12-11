@@ -160,7 +160,9 @@ namespace AdventOfCode
 
             Stopwatch sw = Stopwatch.StartNew();
             method();
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
             int iterations = 1;
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
             if (Benchmark)
             {
                 iterations = Math.Max((int)(seconds / sw.Elapsed.TotalSeconds), 1);
