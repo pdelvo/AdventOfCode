@@ -1,9 +1,4 @@
-﻿using System.IO.MemoryMappedFiles;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using System.Threading;
-
-namespace AdventOfCodeLib.Days
+﻿namespace AdventOfCodeLib.Days
 {
     public class Day2 : Day
     {

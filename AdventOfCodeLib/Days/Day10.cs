@@ -1,10 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO.MemoryMappedFiles;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
+﻿using System.Text;
 
 namespace AdventOfCodeLib.Days
 {

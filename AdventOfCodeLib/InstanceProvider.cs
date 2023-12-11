@@ -1,6 +1,4 @@
-﻿using AdventOfCodeLib.Days;
-
-namespace AdventOfCodeLib
+﻿namespace AdventOfCodeLib
 {
     public abstract partial class InstanceProvider
     {
