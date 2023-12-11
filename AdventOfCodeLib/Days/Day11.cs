@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO.MemoryMappedFiles;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -26,43 +27,52 @@ namespace AdventOfCodeLib.Days
         public override string TestOutput2 => "82000210";
         public override string RunPart1()
         {
-            List<(int x, int y)> galaxies = GetGalaxies();
-            var emptyRows = FindEmptyRows();
-            var emptyColumns = FindEmptyColumns();
-            long distanceTotal = 0;
-
-            for (int i = 0; i < galaxies.Count; i++)
-            {
-                for (int j = i + 1; j < galaxies.Count; j++)
-                {
-                    var distance = GetDistance(emptyRows, emptyColumns, galaxies[i], galaxies[j]);
-                    distanceTotal += distance;
-                }
-            }
+            long distanceTotal = GetTotal(2);
             return distanceTotal.ToString();
         }
 
         public override string RunPart2()
         {
-            List<(int x, int y)> galaxies = GetGalaxies();
+            long distanceTotal = GetTotal(1_000_000);
+            return distanceTotal.ToString();
+        }
+
+        private long GetTotal(long factor)
+        {
+            (int[] rowCounter, int[] columnCounter) = GetGalaxies();
             var emptyRows = FindEmptyRows();
             var emptyColumns = FindEmptyColumns();
             long distanceTotal = 0;
 
-            for (int i = 0; i < galaxies.Count; i++)
+            int last = 0;
+            for (int i = 1; i < rowCounter.Length; i++)
             {
-                for (int j = i + 1; j < galaxies.Count; j++)
-                {
-                    var distance = GetDistance(emptyRows, emptyColumns, galaxies[i], galaxies[j], 1000000);
-                    distanceTotal += distance;
-                }
+                if (rowCounter[i] == rowCounter[last])
+                    continue;
+
+                var distance = GetDistance(emptyRows, last, i, factor);
+                distanceTotal += rowCounter[last] * (rowCounter[rowCounter.Length - 1] - rowCounter[last]) * distance;
+
+                last = i;
             }
-            return distanceTotal.ToString();
+            last = 0;
+            for (int i = 1; i < columnCounter.Length; i++)
+            {
+                if (columnCounter[i] == columnCounter[last])
+                    continue;
+                var distance = GetDistance(emptyColumns, last, i, factor);
+                distanceTotal += columnCounter[last] * (columnCounter[columnCounter.Length - 1] - columnCounter[last]) * distance;
+
+                last = i;
+            }
+
+            return distanceTotal;
         }
 
-        private List<(int x, int y)> GetGalaxies()
+        private (int[] rowCounter, int[] columnCounter) GetGalaxies()
         {
-            var result = new List<(int x, int y)>();
+            int[] rowCounter = new int[Lines.Length];
+            int[] columnCounter = new int[Lines[0].Length];
 
             for (int i = 0; i < Lines.Length; i++)
             {
@@ -70,30 +80,37 @@ namespace AdventOfCodeLib.Days
                 {
                     if (Lines[i][j] != '.')
                     {
-                        result.Add((j, i));
+                        rowCounter[i]++;
+                        columnCounter[j]++;
                     }
                 }
             }
 
-            return result;
+            for (int i = 1; i < rowCounter.Length; i++)
+            {
+                rowCounter[i] += rowCounter[i - 1];
+            }
+
+            for (int j = 1; j < columnCounter.Length; j++)
+            {
+                columnCounter[j] += columnCounter[j - 1];
+            }
+
+            return (rowCounter, columnCounter);
         }
 
-        private long GetDistance(int[] emptyRows, int[] emptyColumns, (int x, int y) galaxy1, (int x, int y) galaxy2, long factor = 2)
+        private long GetDistance(int[] counterArray, int i1, int i2, long factor = 2)
         {
-            var (x1, x2) = AOCMath.MinMax(galaxy1.x, galaxy2.x);
-            var (y1, y2) = AOCMath.MinMax(galaxy1.y, galaxy2.y);
+            var diff = i2 - i1 + (factor - 1) * (counterArray[i2] - counterArray[i1]);
 
-            var diffX = x2 - x1 + (factor - 1) * (emptyColumns[x2] - emptyColumns[x1]);
-            var diffY = y2 - y1 + (factor - 1) * (emptyRows[y2] - emptyRows[y1]);
-
-            return diffX + diffY;
+            return diff;
         }
 
         private int[] FindEmptyRows()
         {
             int[] result = new int[Lines.Length];
 
-            // Outside lines dont matter
+            // Outside lines don't matter
             for (int i = 1; i < Lines.Length; i++)
             {
                 bool allEmpty = true;
