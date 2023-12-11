@@ -42,7 +42,7 @@
                     continue;
 
                 var distance = GetDistance(emptyRows, last, i, factor);
-                distanceTotal += rowCounter[last] * (rowCounter[rowCounter.Length - 1] - rowCounter[last]) * distance;
+                distanceTotal += rowCounter[last] * (rowCounter[^1] - rowCounter[last]) * distance;
 
                 last = i;
             }
@@ -53,7 +53,7 @@
                     continue;
 
                 var distance = GetDistance(emptyColumns, last, i, factor);
-                distanceTotal += columnCounter[last] * (columnCounter[columnCounter.Length - 1] - columnCounter[last]) * distance;
+                distanceTotal += columnCounter[last] * (columnCounter[^1] - columnCounter[last]) * distance;
 
                 last = i;
             }
@@ -91,7 +91,7 @@
             return (rowCounter, columnCounter);
         }
 
-        private long GetDistance(int[] counterArray, int i1, int i2, long factor = 2)
+        private static long GetDistance(int[] counterArray, int i1, int i2, long factor = 2)
             => i2 - i1 + (factor - 1) * (counterArray[i2] - counterArray[i1]);
 
         private int[] FindEmptyRows()

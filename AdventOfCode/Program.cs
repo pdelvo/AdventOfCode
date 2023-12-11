@@ -30,7 +30,9 @@ namespace AdventOfCode
 
             if (!Benchmark)
             {
+#pragma warning disable CS0162 // Unreachable code detected
                 Array.Reverse(instanceProvider.Days);
+#pragma warning restore CS0162 // Unreachable code detected
             }
 
             for (int i = 0; i < instanceProvider.Days.Length; i++)
