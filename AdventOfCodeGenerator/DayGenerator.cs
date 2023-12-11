@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
+using System;
 using System.Linq;
 
 namespace AdventOfCodeGenerator
@@ -10,7 +11,7 @@ namespace AdventOfCodeGenerator
         public void Execute(GeneratorExecutionContext context)
         {
             string[] days = context.Compilation.GetSymbolsWithName(x => x.StartsWith("Day"), SymbolFilter.Type).Where(x => !x.IsAbstract).Select(x=>x.Name).ToArray();
-
+            Array.Sort(days, (a, b) => int.Parse(a.Substring(3)).CompareTo(int.Parse(b.Substring(3))));
             string daysText = string.Join(", ", days.Select(x => "new " + x + "()"));
 
             // Build up the source code
@@ -20,9 +21,9 @@ using AdventOfCodeLib.Days;
 
 namespace AdventOfCodeLib
 {{
-    public partial interface IInstanceProvider
+    public abstract partial class InstanceProvider
     {{
-        public Day[] Days => [{daysText}];
+        public Day[] Days {{ get; }} = [{daysText}];
     }}
 }}
 ";

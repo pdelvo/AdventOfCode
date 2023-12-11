@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AdventOfCodeLib
 {
-    public class Tools
+    public class ParsingHelpers
     {
 
         public static Span<int> ParseNumberList(Span<int> buffer, ReadOnlySpan<char> toParse)

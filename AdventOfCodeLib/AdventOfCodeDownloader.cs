@@ -10,13 +10,13 @@ using Microsoft.Extensions.Configuration;
 
 namespace AdventOfCodeLib
 {
-    public class AdventOfCodeDownloader : IInstanceProvider
+    public class AdventOfCodeDownloader : InstanceProvider
     {
-        HttpClient adventClient;
+        readonly HttpClient adventClient;
 
-        Dictionary<int, WeakReference<string[]>> cache = new Dictionary<int, WeakReference<string[]>>();
+        readonly Dictionary<int, WeakReference<string[]>> cache = [];
 
-        int year;
+        readonly int year;
 
         public AdventOfCodeDownloader(int year)
         {
@@ -36,7 +36,7 @@ namespace AdventOfCodeLib
             adventClient.DefaultRequestHeaders.Add("cookie", $"session={cookie.Trim()}");
         }
 
-        public string[] GetInstance(int day)
+        public override string[] GetInstance(int day)
         {
             string path = $"input/input{day}.txt";
             if (cache.ContainsKey(day))

@@ -18,9 +18,10 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green";
         public override string RunPart1()
         {
             int sum = 0;
+
             Span<Range> split = stackalloc Range[100];
 
-            Dictionary<char, int> limit = new Dictionary<char, int>()
+            Dictionary<char, int> limit = new()
             {
                 ['r'] = 12,
                 ['g'] = 13,
@@ -34,12 +35,42 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green";
                 int gameId = int.Parse(line.AsSpan()[5..colon]);
                 bool success = true;
 
-                bool ProcessEntry(int count, char colorChar)
-                {
-                    return success = limit[colorChar] >= count;
-                }
 
-                ProcessLine(split, after, ProcessEntry);
+                while (after.Length > 0)
+                {
+                    int index = after.IndexOf(";");
+                    if (index == -1)
+                    {
+                        index = after.Length;
+                    }
+
+                    var colorList = after[..index];
+
+                    int splitCount = colorList.Split(split, ',');
+
+                    var splitPart = split[..splitCount];
+                    foreach (var part in splitPart)
+                    {
+                        var text = colorList[part].Trim();
+
+                        int whiteSpace = text.IndexOf(' ');
+
+                        int count = int.Parse(text[..whiteSpace]);
+                        var colorChar = text[(whiteSpace + 1)];
+
+                        if (limit[colorChar] < count)
+                        {
+                            success = false;
+                            break;
+                        }
+                    }
+
+                    if (index + 1 > after.Length)
+                    {
+                        break;
+                    }
+                    after = after[(index + 1)..];
+                }
 
                 if (success)
                 {
@@ -53,6 +84,7 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green";
         public override string RunPart2()
         {
             int sum = 0;
+
             Span<Range> split = stackalloc Range[100];
 
             foreach (var line in Lines)
@@ -61,67 +93,52 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green";
                 var after = line.AsSpan()[(colon + 1)..];
                 int gameId = int.Parse(line.AsSpan()[5..colon]);
 
-                Dictionary<char, int> counter = new Dictionary<char, int>()
+                Dictionary<char, int> counter = new()
                 {
                     ['r'] = 0,
                     ['g'] = 0,
                     ['b'] = 0,
                 };
 
-                bool ProcessEntry(int count, char colorChar)
+                while (after.Length > 0)
                 {
-                    if (counter[colorChar] < count)
+                    int index = after.IndexOf(";");
+                    if (index == -1)
                     {
-                        counter[colorChar] = count;
+                        index = after.Length;
                     }
 
-                    return true;
-                }
+                    var colorList = after[..index];
 
-                ProcessLine(split, after, ProcessEntry);
+                    int splitCount = colorList.Split(split, ',', StringSplitOptions.RemoveEmptyEntries);
+
+                    var splitPart = split[..splitCount];
+                    foreach (var part in splitPart)
+                    {
+                        var text = colorList[part].Trim();
+
+                        int whiteSpace = text.IndexOf(' ');
+
+                        int count = int.Parse(text[..whiteSpace]);
+                        var colorChar = text[(whiteSpace + 1)];
+
+                        if (counter[colorChar] < count)
+                        {
+                            counter[colorChar] = count;
+                        }
+                    }
+
+                    if (index + 1 > after.Length)
+                    {
+                        break;
+                    }
+                    after = after[(index + 1)..];
+                }
                 int product = counter.Values.Aggregate((x, y) => x * y);
                 sum += product;
             }
 
             return sum.ToString();
-        }
-
-        private static void ProcessLine(Span<Range> split, ReadOnlySpan<char> after, Func<int, char, bool> processEntry)
-        {
-            while (after.Length > 0)
-            {
-                int index = after.IndexOf(";");
-                if (index == -1)
-                {
-                    index = after.Length;
-                }
-
-                var colorList = after[..index];
-
-                int splitCount = colorList.Split(split, ',', StringSplitOptions.RemoveEmptyEntries);
-
-                var splitPart = split[..splitCount];
-                foreach (var part in splitPart)
-                {
-                    var text = colorList[part].Trim();
-
-                    int whiteSpace = text.IndexOf(' ');
-
-                    int count = int.Parse(text[..whiteSpace]);
-                    var colorChar = text[(whiteSpace + 1)];
-
-                    if (!processEntry(count, colorChar))
-                    {
-                        return;
-                    }
-                }
-
-                if (index + 1 > after.Length)
-                {
-                    return;
-                }
-                after = after[(index + 1)..];
-            }
         }
     }
 }

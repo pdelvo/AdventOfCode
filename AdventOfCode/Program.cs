@@ -1,4 +1,5 @@
 ﻿using AdventOfCodeLib;
+using AdventOfCodeLib.Days;
 
 using Alba.CsConsoleFormat;
 
@@ -13,6 +14,11 @@ namespace AdventOfCode
     public partial class Program
     {
         private const double seconds = 1;
+#if DEBUG
+        private const bool Benchmark = false;
+#else
+        private const bool Benchmark = true;
+#endif
 
         static Program()
         {
@@ -21,8 +27,14 @@ namespace AdventOfCode
 
         static void Main(string[] args)
         {
-            IInstanceProvider instanceProvider = new AdventOfCodeDownloader(2023);
-            List<(string dayText, string? test1, string? result1, double? time1InUs, string? test2, string? result2, double? time2InUs)> table = new();
+            InstanceProvider instanceProvider = new AdventOfCodeDownloader(2023);
+            List<(string dayText, string? test1, string? result1, double? time1InUs, string? test2, string? result2, double? time2InUs)> table = [];
+
+            if (!Benchmark)
+            {
+                Array.Reverse(instanceProvider.Days);
+            }
+
             for (int i = 0; i < instanceProvider.Days.Length; i++)
             {
                 var day = instanceProvider.Days[i];
@@ -192,7 +204,11 @@ namespace AdventOfCode
 
             Stopwatch sw = Stopwatch.StartNew();
             method();
-            int iterations = Math.Max((int)(seconds / sw.Elapsed.TotalSeconds), 1);
+            int iterations = 1;
+            if (Benchmark)
+            {
+                iterations = Math.Max((int)(seconds / sw.Elapsed.TotalSeconds), 1);
+            }
             sw.Restart();
             for (int i = 0; i < iterations; i++)
             {
