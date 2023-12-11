@@ -60,6 +60,7 @@ namespace AdventOfCodeLib.Days
             {
                 if (columnCounter[i] == columnCounter[last])
                     continue;
+
                 var distance = GetDistance(emptyColumns, last, i, factor);
                 distanceTotal += columnCounter[last] * (columnCounter[columnCounter.Length - 1] - columnCounter[last]) * distance;
 
@@ -100,11 +101,7 @@ namespace AdventOfCodeLib.Days
         }
 
         private long GetDistance(int[] counterArray, int i1, int i2, long factor = 2)
-        {
-            var diff = i2 - i1 + (factor - 1) * (counterArray[i2] - counterArray[i1]);
-
-            return diff;
-        }
+            => i2 - i1 + (factor - 1) * (counterArray[i2] - counterArray[i1]);
 
         private int[] FindEmptyRows()
         {
@@ -123,14 +120,7 @@ namespace AdventOfCodeLib.Days
                     }
                 }
 
-                if (allEmpty)
-                {
-                    result[i] = result[i - 1] + 1;
-                }
-                else
-                {
-                    result[i] = result[i - 1];
-                }
+                result[i] = result[i - 1] + (allEmpty ? 1 : 0);
             }
 
             return result;
@@ -140,7 +130,7 @@ namespace AdventOfCodeLib.Days
         {
             int[] result = new int[Lines[0].Length];
 
-            // Outside lines dont matter
+            // Outside lines don't matter
             for (int j = 1; j < Lines[0].Length; j++)
             {
                 bool allEmpty = true;
@@ -153,14 +143,7 @@ namespace AdventOfCodeLib.Days
                     }
                 }
 
-                if (allEmpty)
-                {
-                    result[j] = result[j - 1] + 1;
-                }
-                else
-                {
-                    result[j] = result[j - 1];
-                }
+                result[j] = result[j - 1] + (allEmpty ?  1 : 0);
             }
 
             return result;
