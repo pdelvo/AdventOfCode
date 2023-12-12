@@ -1,4 +1,6 @@
-﻿namespace AdventOfCodeLib.Days
+﻿using System.Text;
+
+namespace AdventOfCodeLib.Days
 {
     public class Day12 : Day
     {
@@ -11,7 +13,7 @@
 ?###???????? 3,2,1";
         public override string TestOutput1 => "21";
 
-        public override string TestOutput2 => "Test";
+        public override string TestOutput2 => "525152";
         public override string RunPart1()
         {
             long sum = 0;
@@ -19,10 +21,12 @@
             int[] counters = new int[20];
             for (int i = 0;i < Lines.Length; i++)
             {
+                memoization.Clear();
                 ReadOnlySpan<char> record;
                 Span<int> lineCounters = ParseLine(Lines[i], counters, out record);
-                
-                sum += CountOptions(record, lineCounters);
+
+                long count = CountOptions(record, lineCounters);
+                sum += count;
             }
 
             return sum.ToString();
@@ -30,11 +34,53 @@
 
         public override string RunPart2()
         {
-            return "";
+            long sum = 0;
+
+            int[] counters = new int[20];
+            for (int i = 0; i < Lines.Length; i++)
+            {
+                memoization.Clear();
+                ReadOnlySpan<char> record;
+                Span<int> lineCounters = ParseLine(Lines[i], counters, out record);
+
+                Span<char> recordMultiplied = new char[record.Length * 5 + 4];
+
+                for (int j = 0; j < 5; j++)
+                {
+                    record.CopyTo(recordMultiplied[((record.Length + 1) * j)..]);
+
+                    if (j != 4)
+                    {
+                        recordMultiplied[(record.Length + 1) * (j + 1) - 1] = '?';
+                    }
+                }
+
+                Span<int> lineCountersMultiplied = new int[lineCounters.Length * 5];
+
+                for (int j = 0; j < 5; j++)
+                {
+                    lineCounters.CopyTo(lineCountersMultiplied[(lineCounters.Length * j)..]);
+                }
+
+                long count = CountOptions(recordMultiplied, lineCountersMultiplied);
+                sum += count;
+            }
+
+            return sum.ToString();
         }
+        Dictionary<(int recordLength, int lineCounterLength), long> memoization = new Dictionary<(int recordLength, int lineCounterLength), long>();
 
         private long CountOptions(ReadOnlySpan<char> record, ReadOnlySpan<int> lineCounters)
         {
+            if (memoization.TryGetValue((record.Length, lineCounters.Length), out var memoizationResult))
+            {
+                return memoizationResult;
+            }
+            if (lineCounters.Length == 0)
+            {
+                return record.Contains('#') ? 0 : 1;
+            }
+
             Span<Range> parts = stackalloc Range[20];
             int partCount = record.Split(parts, '.', StringSplitOptions.RemoveEmptyEntries);
             Span<int> recordCounters = stackalloc int[20];
@@ -43,33 +89,48 @@
             {
                 recordCounters[i] = parts[i].End.Value - parts[i].Start.Value;
             }
-
             recordCounters = recordCounters[0..partCount];
+            parts = parts[0..partCount];
+            long counter = 0;
 
-            // Use a dynamic program.
-            // dynamicProgramData[i, j] gives the number of options to distribute the first j lineCounters
-            // in the first i sections
-            long[,] dynamicProgramData = new long[recordCounters.Length + 1, lineCounters.Length + 1];
-
-            for (int i = 0; i < recordCounters.Length + 1; i++)
+            for (int partToPlaceIn = 0; partToPlaceIn < partCount; partToPlaceIn++)
             {
-                for (int j = 0; j < lineCounters.Length + 1; j++)
+                var currentRecord = record[parts[partToPlaceIn]];
+                for (int offset = 0; offset <= currentRecord.Length - lineCounters[0]; offset++)
                 {
-                    if (i == 0 || j == 0)
+                    if (parts[partToPlaceIn].Start.Value + offset + lineCounters[0] == record.Length)
                     {
-                        dynamicProgramData[i, j] = 1;
+                        counter += lineCounters.Length == 1 ? 1 : 0;
                     }
+                    else
+                    {
+                        if (offset + lineCounters[0] < currentRecord.Length && currentRecord[offset + lineCounters[0]] == '#')
+                        {
+                            if (currentRecord[offset] == '#')
+                            {
+                                memoization.Add((record.Length, lineCounters.Length), counter);
+                                return counter;
+                            }
+                            continue;
+                        }
+                        counter += CountOptions(record[(parts[partToPlaceIn].Start.Value + offset + lineCounters[0] + 1)..], lineCounters[1..]);
 
-                    // k is how many should be distributed in the current part
-                    for (int k = 0; k <= j; k++)
-                    {
-                        dynamicProgramData[i, j] = Math.Max(dynamicProgramData[i, j],
-                            CountOptions(recordCounters[j], lineCounters[(j - k)..j]) + dynamicProgramData[i, j - k]);
+                        if (currentRecord[offset] == '#')
+                        {
+                            memoization.Add((record.Length, lineCounters.Length), counter);
+                            return counter;
+                        }
                     }
+                }
+
+                if (currentRecord.Contains('#'))
+                {
+                    break;
                 }
             }
 
-            return dynamicProgramData[recordCounters.Length, lineCounters.Length];
+            memoization.Add((record.Length, lineCounters.Length), counter);
+            return counter;
         }
 
         private long CountOptions(int partLength,  ReadOnlySpan<int> lineCounters)
