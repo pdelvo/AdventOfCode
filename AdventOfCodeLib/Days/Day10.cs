@@ -21,7 +21,7 @@ LJ.LJ";
 .L--JL--J.
 ..........";
 
-        static char[] neighborTypes = ['|', '-', 'L', 'J', '7', 'F'];
+        static readonly char[] neighborTypes = ['|', '-', 'L', 'J', '7', 'F'];
 
         public override string TestOutput2 => "4";
         public override string RunPart1()
@@ -32,7 +32,7 @@ LJ.LJ";
         }
         public override string RunPart2()
         {
-            var (counter, map, start, sKind) = WalkPipes();
+            var (_, map, start, sKind) = WalkPipes();
 
             char GetCharAtPositionWithReplacement(int x, int y)
             {
@@ -103,7 +103,7 @@ LJ.LJ";
         {
             int width = Lines[0].Length;
             int height = Lines.Length;
-            StringBuilder builder = new StringBuilder();
+            StringBuilder builder = new();
 
             for (int y = 0; y < height; y++)
             {
@@ -259,24 +259,16 @@ LJ.LJ";
         private ((int x, int y), (int x, int y))? FindNeighbors((int x, int y) position)
         {
             var (x, y) = position;
-            switch (GetPosition(x, y))
+            return GetPosition(x, y) switch
             {
-                case '|':
-                    return ((x, y - 1), (x, y + 1));
-                case '-':
-                    return ((x - 1, y), (x + 1, y));
-                case 'L':
-                    return ((x, y - 1), (x + 1, y));
-                case 'J':
-                    return ((x - 1, y), (x, y - 1));
-                case '7':
-                    return ((x - 1, y), (x, y + 1));
-                case 'F':
-                    return ((x + 1, y), (x, y + 1));
-                default:
-                    return null;
-                    // throw new ArgumentException($"Char '{GetPosition(position.x, position.y)}' is invalid");
-            }
+                '|' => (((int x, int y), (int x, int y))?)((x, y - 1), (x, y + 1)),
+                '-' => (((int x, int y), (int x, int y))?)((x - 1, y), (x + 1, y)),
+                'L' => (((int x, int y), (int x, int y))?)((x, y - 1), (x + 1, y)),
+                'J' => (((int x, int y), (int x, int y))?)((x - 1, y), (x, y - 1)),
+                '7' => (((int x, int y), (int x, int y))?)((x - 1, y), (x, y + 1)),
+                'F' => (((int x, int y), (int x, int y))?)((x + 1, y), (x, y + 1)),
+                _ => null,
+            };
         }
 
         private (int startX, int startY) FindStart()
@@ -310,9 +302,9 @@ LJ.LJ";
             return string.Create(str.Length - length + replace.Length, (str, index, length, replace),
                 (span, state) =>
                 {
-                    state.str.AsSpan().Slice(0, state.index).CopyTo(span);
-                    state.replace.AsSpan().CopyTo(span.Slice(state.index));
-                    state.str.AsSpan().Slice(state.index + state.length).CopyTo(span.Slice(state.index + state.replace.Length));
+                    state.str.AsSpan()[..state.index].CopyTo(span);
+                    state.replace.AsSpan().CopyTo(span[state.index..]);
+                    state.str.AsSpan()[(state.index + state.length)..].CopyTo(span[(state.index + state.replace.Length)..]);
                 });
         }
     }
