@@ -1,24 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AdventOfCodeLib
+﻿namespace AdventOfCodeLib
 {
     public class ParsingHelpers
     {
 
-        public static Span<int> ParseNumberList(Span<int> buffer, ReadOnlySpan<char> toParse)
+        public static Span<int> ParseNumberList(Span<int> buffer, ReadOnlySpan<char> toParse, char splitChar = ' ')
         {
             int winningNumberBufferCount;
             for (winningNumberBufferCount = 0; toParse.Length > 0; winningNumberBufferCount++)
             {
-                while (toParse.Length > 0 && toParse[0] == ' ')
+                while (toParse.Length > 0 && toParse[0] == splitChar)
                 {
                     toParse = toParse[1..];
                 }
-                int indexOfWhitespace = toParse.IndexOf(' ');
+                int indexOfWhitespace = toParse.IndexOf(splitChar);
                 ReadOnlySpan<char> nextNumber = toParse;
                 if (indexOfWhitespace >= 0)
                 {
@@ -36,16 +30,16 @@ namespace AdventOfCodeLib
         }
 
 
-        public static Span<long> ParseNumberList(Span<long> buffer, ReadOnlySpan<char> toParse)
+        public static Span<long> ParseNumberList(Span<long> buffer, ReadOnlySpan<char> toParse, char splitChar = ' ')
         {
             int winningNumberBufferCount;
             for (winningNumberBufferCount = 0; toParse.Length > 0; winningNumberBufferCount++)
             {
-                while (toParse.Length > 0 && toParse[0] == ' ')
+                while (toParse.Length > 0 && toParse[0] == splitChar)
                 {
                     toParse = toParse[1..];
                 }
-                int indexOfWhitespace = toParse.IndexOf(' ');
+                int indexOfWhitespace = toParse.IndexOf(splitChar);
                 ReadOnlySpan<char> nextNumber = toParse;
                 if (indexOfWhitespace >= 0)
                 {

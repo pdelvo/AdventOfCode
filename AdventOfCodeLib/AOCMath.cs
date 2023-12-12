@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AdventOfCodeLib
+﻿namespace AdventOfCodeLib
 {
     public static class AOCMath
     {
@@ -102,6 +96,38 @@ namespace AdventOfCodeLib
                 sn1 = sn2;
                 tn1 = tn2;
             }
+        }
+
+        public static int Sum(this ReadOnlySpan<int> input)
+        {
+            int sum = 0;
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                sum += input[i];
+            }
+
+            return sum;
+        }
+
+        /// <summary>
+        /// Number of partitions of _n_ with exactly k (non-empty) parts
+        /// </summary>
+        /// <param name="n">Size of the ground set</param>
+        /// <param name="k">Number of groups</param>
+        public static long StirlingNumber2ndKind(int n, int k)
+        {
+            if (n == k)
+            {
+                return 1;
+            }
+            if (k == 0 || k > n)
+            {
+                return 0;
+            }
+
+            //Memoization might be good here
+            return StirlingNumber2ndKind(n - 1, k - 1) + k * StirlingNumber2ndKind(n - 1, k);
         }
     }
 }

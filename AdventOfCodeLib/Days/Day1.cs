@@ -92,8 +92,8 @@ zoneight234
                 hashReverse = RunHash(hashReverse, NumberNameList[i][2]);
                 hashReverse = RunHash(hashReverse, NumberNameList[i][1]);
                 hashReverse = RunHash(hashReverse, NumberNameList[i][0]);
-                data.Add(hash, (NumberNameList[i].Substring(3), i));
-                dataReverse.Add(hashReverse, (NumberNameList[i].Substring(3), i));
+                data.Add(hash, (NumberNameList[i][3..], i));
+                dataReverse.Add(hashReverse, (NumberNameList[i][3..], i));
             }
 
             int sum = 0;
