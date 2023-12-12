@@ -8,7 +8,8 @@
         public override string? Description => "Trebuchet?!";
 
         // Initialize data structures
-        public static readonly string[] NumberNameList = ["zero",
+        public static readonly string[] NumberNameList = [
+            "zero",
             "one",
             "two",
             "three",

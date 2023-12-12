@@ -51,7 +51,7 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green";
                     var splitPart = split[..splitCount];
                     foreach (var part in splitPart)
                     {
-                        var text = colorList[part].Trim();
+                        var text = colorList[part][1..];
 
                         int whiteSpace = text.IndexOf(' ');
 
