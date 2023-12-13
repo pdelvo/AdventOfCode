@@ -133,22 +133,6 @@ namespace AdventOfCodeLib.Days
             return counter;
         }
 
-        private long CountOptions(int partLength,  ReadOnlySpan<int> lineCounters)
-        {
-            var counterLength = lineCounters.Sum();
-
-            // We need to distribute remainder onto lineCounters.Length - 1 many non-empty buckets
-            int remainder = partLength - counterLength;
-            if (remainder < 0)
-            {
-                return 0;
-            }
-
-            // We can use stirling numbers of the 2nd kind for this
-
-            return AOCMath.StirlingNumber2ndKind(remainder, lineCounters.Length - 1);
-        }
-
         private Span<int> ParseLine(string input, int[] counters, out ReadOnlySpan<char> record)
         {
             int splitPosition = input.IndexOf(' ');
