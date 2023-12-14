@@ -85,8 +85,6 @@ O.#..O.#.#
             return hashCode;
         }
 
-        char[,] _data;
-
         private void Cycle(char[][] data)
         {
             // Tilt north
