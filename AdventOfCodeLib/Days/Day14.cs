@@ -20,14 +20,14 @@ O.#..O.#.#
         public override string TestOutput2 => "64";
         public override string RunPart1()
         {
-            char[,] data = GetData();
-            Tilt(data, (x, y, _, _) => (x, y), data.GetLength(1), data.GetLength(0));
+            char[][] data = GetData();
+            Tilt(data, (x, y, _, _) => (x, y), data[0].Length, data.Length);
             return ComputeTotal(data).ToString();
         }
 
         public override string RunPart2()
         {
-            char[,] data = GetData();
+            char[][] data = GetData();
             Dictionary<int, int> firstSeen = new Dictionary<int, int>();
             for (int i = 0; i < limit; i++)
             {
@@ -45,20 +45,20 @@ O.#..O.#.#
             return total.ToString();
         }
 
-        private void Print(char[,] data)
+        private void Print(char[][] data)
         {
-            for (int y = 0; y < data.GetLength(0); y++)
+            for (int y = 0; y < data.Length; y++)
             {
-                for (int x = 0; x < data.GetLength(1); x++)
+                for (int x = 0; x < data[0].Length; x++)
                 {
-                    Console.Write(data[y, x]);
+                    Console.Write(data[y][x]);
                 }
                 Console.WriteLine();
             }
             Console.WriteLine();
         }
 
-        private int GetLastSeen(char[,] data, Dictionary<int, int> firstSeen, int position)
+        private int GetLastSeen(char[][] data, Dictionary<int, int> firstSeen, int position)
         {
             int hashCode = GetHash(data);
 
@@ -71,14 +71,14 @@ O.#..O.#.#
             return 0;
         }
 
-        private static int GetHash(char[,] data)
+        private static int GetHash(char[][] data)
         {
             int hashCode = 0;
-            for (int x = 0; x < data.GetLength(1); x++)
+            for (int x = 0; x < data[0].Length; x++)
             {
-                for (int y = 0; y < data.GetLength(0); y++)
+                for (int y = 0; y < data[0].Length; y++)
                 {
-                    hashCode = HashCode.Combine(hashCode, (int)data[y, x]);
+                    hashCode = HashCode.Combine(hashCode, (int)data[y][x]);
                 }
             }
 
@@ -87,53 +87,54 @@ O.#..O.#.#
 
         char[,] _data;
 
-        private void Cycle(char[,] data)
+        private void Cycle(char[][] data)
         {
             // Tilt north
-            Tilt(data, static (x, y, width, height) => (x, y), data.GetLength(1), data.GetLength(0));
+            Tilt(data, static (x, y, width, height) => (x, y), data[0].Length, data.Length);
 
             // Tilt west
-            Tilt(data, static (x, y, width, height) => (y, x), data.GetLength(0), data.GetLength(1));
+            Tilt(data, static (x, y, width, height) => (y, x), data.Length, data[0].Length);
 
             // Tilt south
-            Tilt(data, static (x, y, width, height) => (x, width - 1 - y), data.GetLength(1), data.GetLength(0));
+            Tilt(data, static (x, y, width, height) => (x, width - 1 - y), data[0].Length, data.Length);
 
             // Tilt east
-            Tilt(data, static (x, y, width, height) => (width - 1 - y, x), data.GetLength(0), data.GetLength(1));
+            Tilt(data, static (x, y, width, height) => (width - 1 - y, x), data.Length, data[0].Length);
         }
 
-        private char[] GetData()
+        private char[][] GetData()
         {
-            char[,] result = new char[Lines.Length, Lines[0].Length];
+            char[][] result = new char[Lines.Length][];
 
             for (int line = 0; line < Lines.Length; line++)
             {
+                result[line] = new char[Lines[line].Length];
                 for (int column = 0; column < Lines[line].Length; column++)
                 {
-                    result[line, column] = Lines[line][column];
+                    result[line][column] = Lines[line][column];
                 }
             }
 
             return result;
         }
 
-        private long ComputeTotal(char[,] data)
+        private long ComputeTotal(char[][] data)
         {
             long total = 0;
-            for (int y = 0; y < data.GetLength(0); y++)
+            for (int y = 0; y < data.Length; y++)
             {
-                for (int x = 0; x < data.GetLength(1); x++)
+                for (int x = 0; x < data[y].Length; x++)
                 {
-                    if (data[y, x] == 'O')
+                    if (data[y][x] == 'O')
                     {
-                        total += data.GetLength(0) - y;
+                        total += data.Length - y;
                     }
                 }
             }
             return total;
         }
 
-        private void Tilt(char[,] data, Func<int, int, int, int, (int x, int y)> getPosition, int width, int height)
+        private void Tilt(char[][] data, Func<int, int, int, int, (int x, int y)> getPosition, int width, int height)
         {
             Span<int> moveTo = stackalloc int[width];
 
@@ -142,7 +143,7 @@ O.#..O.#.#
                 for (int x = 0; x < width; x++)
                 {
                     var (posX, posY) = getPosition(x, y, width, height);
-                    switch (data[posY, posX])
+                    switch (data[posY][posX])
                     {
                         case '.':
                             continue;
@@ -151,12 +152,12 @@ O.#..O.#.#
                             break;
                         case 'O':
                             var (moveToX, moveToY) = getPosition(x, moveTo[x], width, height);
-                            data[posY, posX] = '.';
-                            data[moveToY, moveToX] = 'O';
+                            data[posY][posX] = '.';
+                            data[moveToY][moveToX] = 'O';
                             moveTo[x]++;
                             break;
                         default:
-                            throw new Exception($"Invalid symbol '{data[posY, posX]}'.");
+                            throw new Exception($"Invalid symbol '{data[posY][posX]}'.");
                     }
                 }
             }
