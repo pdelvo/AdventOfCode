@@ -39,8 +39,6 @@ O.#..O.#.#
                     i += ((limit - i - 1) / offset) * offset;
                 }
                 Cycle(data);
-
-                long totalTest = ComputeTotal(data);
             }
 
             long total = ComputeTotal(data);
@@ -135,7 +133,7 @@ O.#..O.#.#
 
         private void Tilt(char[,] data, Func<int, int, (int x, int y)> getPosition, int width, int height)
         {
-            int[] moveTo = new int[width];
+            Span<int> moveTo = stackalloc int[width];
 
             for (int y = 0; y < height; y++)
             {
