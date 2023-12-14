@@ -54,9 +54,9 @@ namespace AdventOfCode
                 {
                     continue;
                 }
-                day.Lines = day.TestInput1.Split("\r\n");
+                day.Lines = day.TestInput1.Split("\n", StringSplitOptions.TrimEntries);
                 string testResult1 = day.RunPart1();
-                day.Lines = day.TestInput2.Split("\r\n");
+                day.Lines = day.TestInput2.Split("\n", StringSplitOptions.TrimEntries);
                 string testResult2 = day.RunPart2();
                 if (testResult1 == day.TestOutput1)
                 {
