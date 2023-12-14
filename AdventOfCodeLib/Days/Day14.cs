@@ -29,6 +29,7 @@ O.#..O.#.#
         {
             char[][] data = GetData();
             Dictionary<int, int> firstSeen = new Dictionary<int, int>();
+            List<long> results = new List<long>();
             for (int i = 0; i < limit; i++)
             {
                 var lastSeen = GetLastSeen(data, firstSeen, i);
@@ -36,9 +37,12 @@ O.#..O.#.#
                 if (lastSeen > 0 && i + lastSeen < limit)
                 {
                     var offset = i - 1 - lastSeen;
-                    i += ((limit - i - 1) / offset) * offset;
+                    var index = (limit - i - 1) % offset;
+
+                    return results[lastSeen + index + 1].ToString();
                 }
                 Cycle(data);
+                results.Add(ComputeTotal(data));
             }
 
             long total = ComputeTotal(data);
