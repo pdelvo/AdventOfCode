@@ -21,7 +21,7 @@ O.#..O.#.#
         public override string RunPart1()
         {
             char[][] data = GetData();
-            Tilt(data, (x, y, _, _) => (x, y), data[0].Length, data.Length);
+            TiltNorth(data);
             return ComputeTotal(data).ToString();
         }
 
@@ -89,21 +89,19 @@ O.#..O.#.#
             return hashCode;
         }
 
-        char[,] _data;
-
         private void Cycle(char[][] data)
         {
             // Tilt north
-            Tilt(data, static (x, y, width, height) => (x, y), data[0].Length, data.Length);
+            TiltNorth(data);
 
             // Tilt west
-            Tilt(data, static (x, y, width, height) => (y, x), data.Length, data[0].Length);
+            TiltWest(data);
 
             // Tilt south
-            Tilt(data, static (x, y, width, height) => (x, width - 1 - y), data[0].Length, data.Length);
+            TiltSouth(data);
 
             // Tilt east
-            Tilt(data, static (x, y, width, height) => (width - 1 - y, x), data.Length, data[0].Length);
+            TiltEast(data);
         }
 
         private char[][] GetData()
@@ -138,16 +136,17 @@ O.#..O.#.#
             return total;
         }
 
-        private void Tilt(char[][] data, Func<int, int, int, int, (int x, int y)> getPosition, int width, int height)
+        private void TiltNorth(char[][] data)
         {
+            var width = data.Length;
+            var height = data[0].Length;
             Span<int> moveTo = stackalloc int[width];
 
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
-                    var (posX, posY) = getPosition(x, y, width, height);
-                    switch (data[posY][posX])
+                    switch (data[y][x])
                     {
                         case '.':
                             continue;
@@ -155,13 +154,99 @@ O.#..O.#.#
                             moveTo[x] = y + 1;
                             break;
                         case 'O':
-                            var (moveToX, moveToY) = getPosition(x, moveTo[x], width, height);
-                            data[posY][posX] = '.';
-                            data[moveToY][moveToX] = 'O';
+                            data[y][x] = '.';
+                            data[moveTo[x]][x] = 'O';
                             moveTo[x]++;
                             break;
                         default:
-                            throw new Exception($"Invalid symbol '{data[posY][posX]}'.");
+                            throw new Exception($"Invalid symbol '{data[y][x]}'.");
+                    }
+                }
+            }
+        }
+
+        private void TiltSouth(char[][] data)
+        {
+            var width = data.Length;
+            var height = data[0].Length;
+            Span<int> moveTo = stackalloc int[width];
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    switch (data[height - 1 - y][x])
+                    {
+                        case '.':
+                            continue;
+                        case '#':
+                            moveTo[x] = y + 1;
+                            break;
+                        case 'O':
+                            data[height - 1 - y][x] = '.';
+                            data[height - 1 - moveTo[x]][x] = 'O';
+                            moveTo[x]++;
+                            break;
+                        default:
+                            throw new Exception($"Invalid symbol '{data[height - 1 - y][x]}'.");
+                    }
+                }
+            }
+        }
+
+        private void TiltWest(char[][] data)
+        {
+            var width = data.Length;
+            var height = data[0].Length;
+            Span<int> moveTo = stackalloc int[height];
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    switch (data[y][x])
+                    {
+                        case '.':
+                            continue;
+                        case '#':
+                            moveTo[y] = x + 1;
+                            break;
+                        case 'O':
+                            data[y][x] = '.';
+                            data[y][moveTo[y]] = 'O';
+                            moveTo[y]++;
+                            break;
+                        default:
+                            throw new Exception($"Invalid symbol '{data[y][x]}'.");
+                    }
+                }
+            }
+        }
+
+        private void TiltEast(char[][] data)
+        {
+            var width = data.Length;
+            var height = data[0].Length;
+            Span<int> moveTo = stackalloc int[height];
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    switch (data[y][width - 1 - x])
+                    {
+                        case '.':
+                            continue;
+                        case '#':
+                            moveTo[y] = x + 1;
+                            break;
+                        case 'O':
+                            data[y][width - 1 - x] = '.';
+                            data[y][width - 1 - moveTo[y]] = 'O';
+                            moveTo[y]++;
+                            break;
+                        default:
+                            throw new Exception($"Invalid symbol '{data[y][width - 1 - x]}'.");
                     }
                 }
             }
