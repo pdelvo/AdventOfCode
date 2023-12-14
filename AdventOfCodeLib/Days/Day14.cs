@@ -21,7 +21,7 @@ O.#..O.#.#
         public override string RunPart1()
         {
             char[,] data = GetData();
-            Tilt(data, (x, y) => (x, y), data.GetLength(1), data.GetLength(0));
+            Tilt(data, (x, y, _, _) => (x, y), data.GetLength(1), data.GetLength(0));
             return ComputeTotal(data).ToString();
         }
 
@@ -85,22 +85,24 @@ O.#..O.#.#
             return hashCode;
         }
 
+        char[,] _data;
+
         private void Cycle(char[,] data)
         {
             // Tilt north
-            Tilt(data, (x, y) => (x, y), data.GetLength(1), data.GetLength(0));
+            Tilt(data, static (x, y, width, height) => (x, y), data.GetLength(1), data.GetLength(0));
 
             // Tilt west
-            Tilt(data, (x, y) => (y, x), data.GetLength(0), data.GetLength(1));
+            Tilt(data, static (x, y, width, height) => (y, x), data.GetLength(0), data.GetLength(1));
 
             // Tilt south
-            Tilt(data, (x, y) => (x, data.GetLength(1) - 1 - y), data.GetLength(1), data.GetLength(0));
+            Tilt(data, static (x, y, width, height) => (x, width - 1 - y), data.GetLength(1), data.GetLength(0));
 
             // Tilt east
-            Tilt(data, (x, y) => (data.GetLength(0) - 1 - y, x), data.GetLength(0), data.GetLength(1));
+            Tilt(data, static (x, y, width, height) => (width - 1 - y, x), data.GetLength(0), data.GetLength(1));
         }
 
-        private char[,] GetData()
+        private char[] GetData()
         {
             char[,] result = new char[Lines.Length, Lines[0].Length];
 
@@ -131,7 +133,7 @@ O.#..O.#.#
             return total;
         }
 
-        private void Tilt(char[,] data, Func<int, int, (int x, int y)> getPosition, int width, int height)
+        private void Tilt(char[,] data, Func<int, int, int, int, (int x, int y)> getPosition, int width, int height)
         {
             Span<int> moveTo = stackalloc int[width];
 
@@ -139,7 +141,7 @@ O.#..O.#.#
             {
                 for (int x = 0; x < width; x++)
                 {
-                    var (posX, posY) = getPosition(x, y);
+                    var (posX, posY) = getPosition(x, y, width, height);
                     switch (data[posY, posX])
                     {
                         case '.':
@@ -148,7 +150,7 @@ O.#..O.#.#
                             moveTo[x] = y + 1;
                             break;
                         case 'O':
-                            var (moveToX, moveToY) = getPosition(x, moveTo[x]);
+                            var (moveToX, moveToY) = getPosition(x, moveTo[x], width, height);
                             data[posY, posX] = '.';
                             data[moveToY, moveToX] = 'O';
                             moveTo[x]++;
