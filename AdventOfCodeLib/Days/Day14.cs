@@ -20,14 +20,14 @@ O.#..O.#.#
         public override string TestOutput2 => "64";
         public override string RunPart1()
         {
-            char[][] data = GetData();
+            byte[][] data = GetData();
             TiltNorth(data);
             return ComputeTotal(data).ToString();
         }
 
         public override string RunPart2()
         {
-            char[][] data = GetData();
+            byte[][] data = GetData();
             Dictionary<int, int> firstSeen = new Dictionary<int, int>();
             List<long> results = new List<long>();
             for (int i = 0; i < limit; i++)
@@ -62,7 +62,7 @@ O.#..O.#.#
             Console.WriteLine();
         }
 
-        private int GetLastSeen(char[][] data, Dictionary<int, int> firstSeen, int position)
+        private int GetLastSeen(byte[][] data, Dictionary<int, int> firstSeen, int position)
         {
             int hashCode = GetHash(data);
 
@@ -75,21 +75,24 @@ O.#..O.#.#
             return 0;
         }
 
-        private static int GetHash(char[][] data)
+        private static int GetHash(byte[][] data)
         {
             int hashCode = 0;
             for (int x = 0; x < data[0].Length; x++)
             {
-                for (int y = 0; y < data[0].Length; y++)
+                for (int y = 0; y < data.Length; y++)
                 {
-                    hashCode = HashCode.Combine(hashCode, (int)data[y][x]);
+                    if (data[y][x] == 'O')
+                    {
+                        hashCode = HashCode.Combine(hashCode, (y << 8) | x);
+                    }
                 }
             }
 
             return hashCode;
         }
 
-        private void Cycle(char[][] data)
+        private void Cycle(byte[][] data)
         {
             // Tilt north
             TiltNorth(data);
@@ -104,23 +107,23 @@ O.#..O.#.#
             TiltEast(data);
         }
 
-        private char[][] GetData()
+        private byte[][] GetData()
         {
-            char[][] result = new char[Lines.Length][];
+            byte[][] result = new byte[Lines.Length][];
 
             for (int line = 0; line < Lines.Length; line++)
             {
-                result[line] = new char[Lines[line].Length];
+                result[line] = new byte[Lines[line].Length];
                 for (int column = 0; column < Lines[line].Length; column++)
                 {
-                    result[line][column] = Lines[line][column];
+                    result[line][column] = (byte)Lines[line][column];
                 }
             }
 
             return result;
         }
 
-        private long ComputeTotal(char[][] data)
+        private long ComputeTotal(byte[][] data)
         {
             long total = 0;
             for (int y = 0; y < data.Length; y++)
@@ -136,26 +139,26 @@ O.#..O.#.#
             return total;
         }
 
-        private void TiltNorth(char[][] data)
+        private void TiltNorth(byte[][] data)
         {
             var width = data.Length;
             var height = data[0].Length;
             Span<int> moveTo = stackalloc int[width];
 
-            for (int y = 0; y < height; y++)
+            for (int x = 0; x < width; x++)
             {
-                for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
                 {
                     switch (data[y][x])
                     {
-                        case '.':
+                        case (byte)'.':
                             continue;
-                        case '#':
+                        case (byte)'#':
                             moveTo[x] = y + 1;
                             break;
-                        case 'O':
-                            data[y][x] = '.';
-                            data[moveTo[x]][x] = 'O';
+                        case (byte)'O':
+                            data[y][x] = (byte)'.';
+                            data[moveTo[x]][x] = (byte)'O';
                             moveTo[x]++;
                             break;
                         default:
@@ -165,7 +168,7 @@ O.#..O.#.#
             }
         }
 
-        private void TiltSouth(char[][] data)
+        private void TiltSouth(byte[][] data)
         {
             var width = data.Length;
             var height = data[0].Length;
@@ -177,14 +180,14 @@ O.#..O.#.#
                 {
                     switch (data[height - 1 - y][x])
                     {
-                        case '.':
+                        case (byte)'.':
                             continue;
-                        case '#':
+                        case (byte)'#':
                             moveTo[x] = y + 1;
                             break;
-                        case 'O':
-                            data[height - 1 - y][x] = '.';
-                            data[height - 1 - moveTo[x]][x] = 'O';
+                        case (byte)'O':
+                            data[height - 1 - y][x] = (byte)'.';
+                            data[height - 1 - moveTo[x]][x] = (byte)'O';
                             moveTo[x]++;
                             break;
                         default:
@@ -194,7 +197,7 @@ O.#..O.#.#
             }
         }
 
-        private void TiltWest(char[][] data)
+        private void TiltWest(byte[][] data)
         {
             var width = data.Length;
             var height = data[0].Length;
@@ -206,14 +209,14 @@ O.#..O.#.#
                 {
                     switch (data[y][x])
                     {
-                        case '.':
+                        case (byte)'.':
                             continue;
-                        case '#':
+                        case (byte)'#':
                             moveTo[y] = x + 1;
                             break;
-                        case 'O':
-                            data[y][x] = '.';
-                            data[y][moveTo[y]] = 'O';
+                        case (byte)'O':
+                            data[y][x] = (byte)'.';
+                            data[y][moveTo[y]] = (byte)'O';
                             moveTo[y]++;
                             break;
                         default:
@@ -223,7 +226,7 @@ O.#..O.#.#
             }
         }
 
-        private void TiltEast(char[][] data)
+        private void TiltEast(byte[][] data)
         {
             var width = data.Length;
             var height = data[0].Length;
@@ -235,14 +238,14 @@ O.#..O.#.#
                 {
                     switch (data[y][width - 1 - x])
                     {
-                        case '.':
+                        case (byte)'.':
                             continue;
-                        case '#':
+                        case (byte)'#':
                             moveTo[y] = x + 1;
                             break;
-                        case 'O':
-                            data[y][width - 1 - x] = '.';
-                            data[y][width - 1 - moveTo[y]] = 'O';
+                        case (byte)'O':
+                            data[y][width - 1 - x] = (byte)'.';
+                            data[y][width - 1 - moveTo[y]] = (byte)'O';
                             moveTo[y]++;
                             break;
                         default:
