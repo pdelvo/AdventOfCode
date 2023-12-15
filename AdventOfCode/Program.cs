@@ -26,7 +26,7 @@ namespace AdventOfCode
         static void Main(string[] args)
         {
             InstanceProvider instanceProvider = new AdventOfCodeDownloader(2023);
-            List<(string dayText, string? test1, string? result1, double? time1InUs, string? test2, string? result2, double? time2InUs)> table = [];
+            List<(string dayText, string? test1, string? result1, double? time1InS, string? test2, string? result2, double? time2InS)> table = [];
 
             if (!Benchmark)
             {
@@ -92,28 +92,28 @@ namespace AdventOfCode
 
 
 
-                (double time1InUs, string result1) = SpeedTest(day.RunPart1);
+                (double time1InS, string result1) = SpeedTest(day.RunPart1);
 
                 table[i] = table[i] with
                 {
                     result1 = result1,
-                    time1InUs = time1InUs
+                    time1InS = time1InS
                 };
 
                 RenderTable(table);
-                (double time2InUs, string result2) = SpeedTest(day.RunPart2);
+                (double time2InS, string result2) = SpeedTest(day.RunPart2);
 
                 table[i] = table[i] with
                 {
                     result2 = result2,
-                    time2InUs = time2InUs
+                    time2InS = time2InS
                 };
 
                 RenderTable(table);
             }
         }
 
-        static void RenderTable(List<(string dayText, string? test1, string? result1, double? time1InUs, string? test2, string? result2, double? time2InUs)> table)
+        static void RenderTable(List<(string dayText, string? test1, string? result1, double? time1InS, string? test2, string? result2, double? time2InS)> table)
         {
             var grid = new Grid() { Color = DarkGray };
             var document = new Document(grid);
@@ -123,35 +123,49 @@ namespace AdventOfCode
             grid.Columns.Add(new Column { Width = GridLength.Auto });
             grid.Columns.Add(new Column { Width = GridLength.Auto });
             grid.Columns.Add(new Column { Width = GridLength.Auto });
-            grid.Columns.Add(new Column { Width = GridLength.Auto });
 
             grid.Children.Add(new Cell("🎄 Advent of Code 2023 🎄") { Color = Magenta, ColumnSpan = 7, Align = Align.Center });
             grid.Children.Add(new Cell("Day") { Color = Yellow, RowSpan = 2, Align = Align.Center, VerticalAlign = VerticalAlign.Center });
-            grid.Children.Add(new Cell("Part 1") { Color = Yellow, ColumnSpan = 3, Align = Align.Center });
-            grid.Children.Add(new Cell("Part 2") { Color = Yellow, ColumnSpan = 3, Align = Align.Center });
-            grid.Children.Add(new Cell("test") { Color = Green, Align = Align.Center });
+            grid.Children.Add(new Cell("Tests") { Color = Green, Align = Align.Center, RowSpan = 2 });
+            grid.Children.Add(new Cell("Part 1") { Color = Yellow, ColumnSpan = 2, Align = Align.Center });
+            grid.Children.Add(new Cell("Part 2") { Color = Yellow, ColumnSpan = 2, Align = Align.Center });
             grid.Children.Add(new Cell("result") { Color = Blue, Align = Align.Center });
             grid.Children.Add(new Cell("time") { Color = Red, Align = Align.Center });
-            grid.Children.Add(new Cell("test") { Color = Green, Align = Align.Center });
             grid.Children.Add(new Cell("result") { Color = Blue, Align = Align.Center });
             grid.Children.Add(new Cell("time") { Color = Red, Align = Align.Center });
 
             foreach (var (dayText, test1, result1, time1InUs, test2, result2, time2InUs) in table)
             {
                 grid.Children.Add(new Cell(dayText) { Color = White, Align = Align.Left });
-                grid.Children.Add(new Cell(test1) { Color = White, Align = Align.Right });
+                var testText = "";
+                if (test1 != "Success")
+                {
+                    testText = test1;
+                }
+                else if (test2 != "Success")
+                {
+                    testText = test2;
+                }
+                else
+                {
+                    testText = "Success";
+                }
+                grid.Children.Add(new Cell(testText) { Color = White, Align = Align.Right });
                 grid.Children.Add(new Cell(result1) { Color = White, Align = Align.Right });
-                grid.Children.Add(new Cell(time1InUs?.ToString("0.00") + " µs") { Color = White, Align = Align.Right });
-                grid.Children.Add(new Cell(test2) { Color = White, Align = Align.Right });
+                grid.Children.Add(new Cell(FormatTime(time1InUs)) { Color = White, Align = Align.Right });
                 grid.Children.Add(new Cell(result2) { Color = White, Align = Align.Right });
-                grid.Children.Add(new Cell(time2InUs?.ToString("0.00") + " µs") { Color = White, Align = Align.Right });
+                grid.Children.Add(new Cell(FormatTime(time2InUs)) { Color = White, Align = Align.Right });
             }
 
+            //Console.Clear();
+            Console.CursorVisible = false;
+            var result = ConsoleRenderer.RenderDocumentToText(document, new AnsiRenderTarget());
             Console.Clear();
-            ConsoleRenderer.RenderDocument(document);
+            Console.Write(result);
+            Console.CursorVisible = true;
         }
 
-        static (double timeInUs, string result) SpeedTest(Func<string> method)
+        static (double timeInS, string result) SpeedTest(Func<string> method)
         {
             // Run once for JIT compilation, not needed for AOT compile
             method();
@@ -173,9 +187,82 @@ namespace AdventOfCode
                 result = method();
             }
 
-            var totalTime = ((double)sw.ElapsedTicks / Stopwatch.Frequency) * Math.Pow(10, 6) / iterations;
+            var totalTime = ((double)sw.ElapsedTicks / Stopwatch.Frequency) / iterations;
 
             return (totalTime, result);
+        }
+
+        static string FormatTime(double? timeInS)
+        {
+            if (timeInS == null)
+            {
+                return "-";
+            }
+
+            return FormatMetric(timeInS.Value) + "s";
+        }
+        static string FormatMetric(double input)
+        {
+            string prefix = "";
+            var value = Math.Abs(input);
+            if (value == 0 || (value >= 1 && value < 1000))
+            {
+            }
+            else if (value >= 1000)
+            {
+                string[] prefixes =
+                [
+                    "",
+                    "k",
+                    "M",
+                    "G",
+                    "T",
+                    "P",
+                    "E",
+                    "Z",
+                    "Y",
+                    "R",
+                    "Q"
+                ];
+                int index = 0;
+                while (value >= 1000)
+                {
+                    value /= 1000;
+                    index++;
+                }
+                prefix = prefixes[index];
+            }
+            else
+            {
+                string[] prefixes =
+                [
+                    "",
+                    "m",
+                    "μ",
+                    "n",
+                    "p",
+                    "f",
+                    "a",
+                    "z",
+                    "y",
+                    "r",
+                    "q"
+                ];
+                int index = 0;
+                while (value < 1)
+                {
+                    value *= 1000;
+                    index++;
+                }
+                prefix = prefixes[index];
+            }
+
+            if (input < 0)
+            {
+                value *= -1;
+            }
+
+            return value.ToString("0.00") + " " + prefix;
         }
     }
 }
