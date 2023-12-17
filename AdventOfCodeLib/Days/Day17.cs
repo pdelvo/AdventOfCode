@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 
 namespace AdventOfCodeLib.Days
@@ -51,7 +52,6 @@ namespace AdventOfCodeLib.Days
             };
             toVisit.Enqueue(startConfiguration, 0);
             int shortestPathFound = int.MaxValue;
-            (int x, int y, Orientation orientation) shortestPathEndpoint = default;
             while (toVisit.Count > 0)
             {
                 var (x, y, orientation) = toVisit.Dequeue();
@@ -62,7 +62,6 @@ namespace AdventOfCodeLib.Days
                     if (currentCost < shortestPathFound)
                     {
                         shortestPathFound = currentCost;
-                        shortestPathEndpoint = (x, y, orientation);
                     }
                     continue;
                 }
@@ -78,32 +77,16 @@ namespace AdventOfCodeLib.Days
                     int minusCounter = 0;
                     for (int i = 1; i <= maxDirection; i++)
                     {
+                        (int x, int y) negative = (x - i, y);
+                        (int x, int y) positive = (x + i, y);
                         minusCounter += GetValue(x - i, y);
                         plusCounter += GetValue(x + i, y);
                         if (i < minDirection)
                         {
                             continue;
                         }
-                        if (IsValid(x - i, y))
-                        {
-                            if (CurrentCost(x - i, y, Orientation.Horizontal) > currentCost + minusCounter)
-                            {
-                                map[(x - i, y, Orientation.Horizontal)] = currentCost + minusCounter;
-                                preceding[(x - i, y, Orientation.Horizontal)] = (x, y, orientation);
-                                // Todo: Add estimation here
-                                toVisit.EnqueueOrUpdate((x - i, y, Orientation.Horizontal), currentCost + minusCounter);
-                            }
-                        }
-                        if (IsValid(x + i, y))
-                        {
-                            if (CurrentCost(x + i, y, Orientation.Horizontal) > currentCost + plusCounter)
-                            {
-                                map[(x + i, y, Orientation.Horizontal)] = currentCost + plusCounter;
-                                preceding[(x + i, y, Orientation.Horizontal)] = (x, y, orientation);
-                                // Todo: Add estimation here
-                                toVisit.EnqueueOrUpdate((x + i, y, Orientation.Horizontal), currentCost + plusCounter);
-                            }
-                        }
+                        UpdateIfValid(x, y, orientation, Orientation.Horizontal, currentCost, minusCounter, negative);
+                        UpdateIfValid(x, y, orientation, Orientation.Horizontal, currentCost, plusCounter, positive);
                     }
                 }
                 if (orientation != Orientation.Vertical)
@@ -112,32 +95,16 @@ namespace AdventOfCodeLib.Days
                     int minusCounter = 0;
                     for (int i = 1; i <= maxDirection; i++)
                     {
+                        (int x, int y) negative = (x, y - i);
+                        (int x, int y) positive = (x, y + i);
                         minusCounter += GetValue(x, y - i);
                         plusCounter += GetValue(x, y + i);
                         if (i < minDirection)
                         {
                             continue;
                         }
-                        if (IsValid(x, y - i))
-                        {
-                            if (CurrentCost(x, y - i, Orientation.Vertical) > currentCost + minusCounter)
-                            {
-                                map[(x, y - i, Orientation.Vertical)] = currentCost + minusCounter;
-                                preceding[(x, y - i, Orientation.Vertical)] = (x, y, orientation);
-                                // Todo: Add estimation here
-                                toVisit.EnqueueOrUpdate((x, y - i, Orientation.Vertical), currentCost + minusCounter);
-                            }
-                        }
-                        if (IsValid(x, y + i))
-                        {
-                            if (CurrentCost(x, y + i, Orientation.Vertical) > currentCost + plusCounter)
-                            {
-                                map[(x, y + i, Orientation.Vertical)] = currentCost + plusCounter;
-                                preceding[(x, y + i, Orientation.Vertical)] = (x, y, orientation);
-                                // Todo: Add estimation here
-                                toVisit.EnqueueOrUpdate((x, y + i, Orientation.Vertical), currentCost + plusCounter);
-                            }
-                        }
+                        UpdateIfValid(x, y, orientation, Orientation.Vertical, currentCost, minusCounter, negative);
+                        UpdateIfValid(x, y, orientation, Orientation.Vertical, currentCost, plusCounter, positive);
                     }
                 }
             }
@@ -152,6 +119,20 @@ namespace AdventOfCodeLib.Days
                 }
                 return int.MaxValue;
             }
+
+            void UpdateIfValid(int x, int y, Orientation orientation, Orientation newOrientation, int currentCost, int counter, (int x, int y) coordinates)
+            {
+                if (IsValid(coordinates))
+                {
+                    if (CurrentCost(coordinates.x, coordinates.y, newOrientation) > currentCost + counter)
+                    {
+                        map[(coordinates.x, coordinates.y, newOrientation)] = currentCost + counter;
+                        preceding[(coordinates.x, coordinates.y, newOrientation)] = (x, y, orientation);
+                        // Todo: Add estimation here
+                        toVisit.EnqueueOrUpdate((coordinates.x, coordinates.y, newOrientation), currentCost + counter);
+                    }
+                }
+            }
         }
 
         private int GetValue(int x, int y)
@@ -165,6 +146,8 @@ namespace AdventOfCodeLib.Days
         }
 
         private bool IsValid(int x, int y) => x >= 0 && y >= 0 && x < Lines[0].Length && y < Lines.Length;
+        private bool IsValid((int x, int y) coordinates)
+            => coordinates.x >= 0 && coordinates.y >= 0 && coordinates.x < Lines[0].Length && coordinates.y < Lines.Length;
 
         private enum Orientation
         {
@@ -173,17 +156,62 @@ namespace AdventOfCodeLib.Days
             None
         }
 
-        private class UpdatablePriorityQueue<TElement>
+        private class UpdatablePriorityQueue<TElement> where TElement : notnull
         {
-            private Dictionary<TElement, int> data = new ();
+            private (TElement, int)[] data;
+            private Dictionary<TElement, int> elementToPosition = new();
+            private int count;
+
+            public UpdatablePriorityQueue()
+            {
+                data = new (TElement, int)[128];
+            }
+
+            private int GetParent(int index) => (index - 1) >> 1;
+            private int GetFirstChild(int index) => (index << 1) + 1;
+
+            private void SetElement(int position, (TElement element, int priority) toPlace)
+            {
+                data[position] = toPlace;
+                elementToPosition[toPlace.element] = position;
+            }
+
+            private void Grow(int minCapacity)
+            {
+                int newSize = minCapacity * 2;
+                Array.Resize(ref data, newSize);
+            }
 
             public void Enqueue(TElement element, int priority)
             {
-                data.Add(element, priority);
+                if (++count == data.Length)
+                {
+                    Grow(count + 1);
+                }
+
+                SetElement(count - 1, (element, priority));
+                BubbleUp(count - 1);
             }
+
             public void EnqueueOrUpdate(TElement element, int priority)
             {
-                data[element] = priority;
+                if (elementToPosition.TryGetValue(element, out var index))
+                {
+                    (TElement element, int priority) current = data[index];
+                    SetElement(index, (element, priority));
+                    if (priority > current.priority)
+                    {
+                        BubbleUp(index);
+                    }
+                    else
+                    {
+                        BubbleDown((element, priority), index);
+                    }
+                }
+                else
+                {
+                    Enqueue(element, priority);
+                }
             }
 
             public TElement Dequeue()
@@ -193,22 +221,74 @@ namespace AdventOfCodeLib.Days
                     throw new InvalidOperationException("Queue is empty");
                 }
 
-                TElement? smallest = default;
-                int smallestPriority = int.MaxValue;
+                var (element, _) = data[0];
 
-                foreach (var value in data)
-                {
-                    if (value.Value < smallestPriority)
-                    {
-                        smallestPriority = value.Value;
-                        smallest = value.Key;
-                    }
-                }
-                data.Remove(smallest!);
-                return smallest!;
+                elementToPosition.Remove(element);
+
+                RemoveRoot();
+
+                return element;
             }
 
-            public int Count => data.Count;
+            private void RemoveRoot()
+            {
+                int lastNodeIndex = --count;
+                var lastNode = data[lastNodeIndex];
+
+                if (lastNodeIndex > 0)
+                {
+                    BubbleDown(lastNode, 0);
+                }
+            }
+
+            private void BubbleDown((TElement element, int priority) node, int position)
+            {
+                int i;
+                while ((i = GetFirstChild(position)) < count)
+                {
+                    (TElement element, int priority) smallestChild = data[i];
+                    (TElement element, int priority) child2 = data[i + 1];
+
+                    if (child2.priority < smallestChild.priority)
+                    {
+                        i++;
+                        smallestChild = child2;
+                    }
+
+                    if (node.priority < smallestChild.priority)
+                    {
+                        break;
+                    }
+
+                    SetElement(position, smallestChild);
+                    position = i;
+                }
+                SetElement(position, node);
+            }
+
+            private void BubbleUp(int position)
+            {
+                (TElement element, int priority) = data[position];
+                while (position != 0)
+                {
+                    var parentIndex = GetParent(position);
+                    (TElement element, int priority) parent = data[position];
+
+                    if (priority < parent.priority)
+                    {
+                        SetElement(position, parent);
+                        position = parentIndex;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                SetElement(position, (element, priority));
+            }
+
+            public int Count => count;
         }
     }
 }
