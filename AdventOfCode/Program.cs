@@ -138,17 +138,20 @@ namespace AdventOfCode
             {
                 grid.Children.Add(new Cell(dayText) { Color = White, Align = Align.Left });
                 var testText = "";
-                if (test1 != "Success")
+                if (test1 != "Success" && !string.IsNullOrEmpty(test1))
                 {
-                    testText = test1;
+                    testText = "Test 1: " + test1;
                 }
-                else if (test2 != "Success")
+                else if (test2 != "Success" && !string.IsNullOrEmpty(test2))
                 {
-                    testText = test2;
+                    testText = "Test 2: " + test2;
                 }
                 else
                 {
-                    testText = "Success";
+                    if (!string.IsNullOrEmpty(test1) && !string.IsNullOrEmpty(test2))
+                    {
+                        testText = "Success";
+                    }
                 }
                 grid.Children.Add(new Cell(testText) { Color = White, Align = Align.Right });
                 grid.Children.Add(new Cell(result1) { Color = White, Align = Align.Right });
