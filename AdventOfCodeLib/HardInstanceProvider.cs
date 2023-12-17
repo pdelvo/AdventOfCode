@@ -7,7 +7,7 @@ namespace AdventOfCodeLib
     public class HardInstanceProvider : InstanceProvider
     {
         readonly Random random = new(0);
-        public Day[] Days => [new Day5()];
+        public override Day[] Days => [new Day5()];
         public override string[] GetInstance(int day) => day switch
         {
             //1 => GenerateDay1(),

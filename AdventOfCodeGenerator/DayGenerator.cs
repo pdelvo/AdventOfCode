@@ -23,7 +23,7 @@ namespace AdventOfCodeLib
 {{
     public abstract partial class InstanceProvider
     {{
-        public Day[] Days {{ get; }} = [{daysText}];
+        public virtual Day[] Days {{ get; }} = [{daysText}];
     }}
 }}
 ";
