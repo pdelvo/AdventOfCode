@@ -34,7 +34,10 @@ namespace AdventOfCodeLib.Days
         {
             const int maxDirection = 10;
             const int minDirection = 4;
-            return Solve(maxDirection, minDirection).ToString();
+            checked
+            {
+                return Solve(maxDirection, minDirection).ToString();
+            }
         }
 
         private int Solve(int maxDirection, int minDirection)
@@ -44,7 +47,7 @@ namespace AdventOfCodeLib.Days
             {
                 { startConfiguration, 0 }
             };
-            Dictionary<(int x, int y, Orientation orientation), (int x, int y, Orientation orientation)> preceding = new();
+            //Dictionary<(int x, int y, Orientation orientation), (int x, int y, Orientation orientation)> preceding = [];
             UpdatablePriorityQueue<(int x, int y, Orientation orientation)> toVisit = new();
             Dictionary<(int x, int y, Orientation orientation), int> toVisitMap = new()
             {
@@ -66,7 +69,7 @@ namespace AdventOfCodeLib.Days
                     continue;
                 }
 
-                if (currentCost > shortestPathFound)
+                if (Estimate(x, y, currentCost) > shortestPathFound)
                 {
                     continue;
                 }
@@ -113,6 +116,11 @@ namespace AdventOfCodeLib.Days
 
             int CurrentCost(int x, int y, Orientation orientation)
             {
+                if (x == 0 && y == 0)
+                {
+                    return 0;
+                }
+
                 if (map.TryGetValue((x, y, orientation), out var value))
                 {
                     return value;
@@ -127,12 +135,17 @@ namespace AdventOfCodeLib.Days
                     if (CurrentCost(coordinates.x, coordinates.y, newOrientation) > currentCost + counter)
                     {
                         map[(coordinates.x, coordinates.y, newOrientation)] = currentCost + counter;
-                        preceding[(coordinates.x, coordinates.y, newOrientation)] = (x, y, orientation);
+                        //preceding[(coordinates.x, coordinates.y, newOrientation)] = (x, y, orientation);
                         // Todo: Add estimation here
-                        toVisit.EnqueueOrUpdate((coordinates.x, coordinates.y, newOrientation), currentCost + counter);
+                        toVisit.EnqueueOrUpdate((coordinates.x, coordinates.y, newOrientation), currentCost + counter - x - y);
                     }
                 }
             }
+        }
+
+        private int Estimate(int x, int y, int currentCost)
+        {
+            return currentCost + Lines.Length + Lines[0].Length - x - y;
         }
 
         private int GetValue(int x, int y)
