@@ -1,4 +1,6 @@
 ﻿
+using System.Globalization;
+
 namespace AdventOfCodeLib.Days
 {
     public class Day18 : Day
@@ -23,18 +25,9 @@ U 2 (#7a21e3)";
         public override string TestOutput2 => "952408144115";
         public override string RunPart1()
         {
-            int width = 1000;
-            int height = 1000;
-            (int currentX, int currentY) = (500, 500);
-
-            TileType[][] tiles = new TileType[height][];
-
-            for (int i = 0; i < height; i++)
-            {
-                tiles[i] = new TileType[width];
-            }
-
-            tiles[currentY][currentX] = TileType.Border;
+            List<(int x, int y, Turn turn)> points = [(0, 0, Turn.None)];
+            List<Instruction> instructions = new();
+            long insideCounter = 0;
 
             for (int i = 0; i < Lines.Length; i++)
             {
@@ -42,77 +35,66 @@ U 2 (#7a21e3)";
 
                 var (moveX, moveY) = instruction.GetOffset();
 
-                for (int step = 1; step <= instruction.NumberOfSteps; step++)
+                var currentPoint = points[i];
+
+                (int x, int y) nextPoint = (currentPoint.x + moveX * instruction.NumberOfSteps, currentPoint.y + moveY * instruction.NumberOfSteps);
+
+                if (instructions.Count > 1)
                 {
-                    (currentX, currentY) = (currentX + moveX, currentY + moveY);
+                    var turn1 = GetTurnType(instructions[i - 2], instructions[i - 1]);
+                    var turn2 = GetTurnType(instructions[i - 1], instruction);
 
-                    tiles[currentY][currentX] = TileType.Border;
-                }
-            }
-
-            // Do a fill
-            Queue<(int x, int y)> toCheck = new();
-
-            for (int i = 0; i < width; i++)
-            {
-                toCheck.Enqueue((0, i));
-                toCheck.Enqueue((width - 1, i));
-            }
-
-            for (int i = 1; i < height - 1; i++)
-            {
-                toCheck.Enqueue((i, 0));
-                toCheck.Enqueue((i, height - 1));
-            }
-
-            while (toCheck.Count > 0)
-            {
-                var next = toCheck.Dequeue();
-
-                if (IsValid(width, height, next))
-                {
-                    if (tiles[next.y][next.x] == TileType.Unknown)
+                    if (turn1 == turn2)
                     {
-                        tiles[next.y][next.x] = TileType.Outside;
-                        toCheck.Enqueue((next.x + 1, next.y));
-                        toCheck.Enqueue((next.x, next.y + 1));
-                        toCheck.Enqueue((next.x - 1, next.y));
-                        toCheck.Enqueue((next.x, next.y - 1));
+
                     }
                 }
-            }
-
-            int insideCounter = 0;
-
-            for (int i = 0; i < width; i++)
-            {
-                for (int j = 0; j < height; j++)
-                {
-                    if (tiles[j][i] == TileType.Unknown
-                        || tiles[j][i] == TileType.Border)
-                    {
-                        insideCounter++;
-                    }
-                }
+                instructions.Add(instruction);
+                points.Add((nextPoint.x, nextPoint.y, );
             }
 
             return insideCounter.ToString();
         }
 
+        private Turn GetTurnType(Instruction instruction1, Instruction instruction2)
+        {
+            if (instruction1.Direction == Direction.None || instruction2.Direction == Direction.None)
+            {
+                return Turn.None;
+            }
+
+            if (instruction1.Direction + 1 % 4 == instruction2.Direction)
+            {
+                return Turn.Right;
+            }
+
+            if (instruction1.Direction == instruction2.Direction + 1 % 4)
+            {
+                return Turn.Right;
+            }
+
+            return Turn.None;
+        }
+
         private static bool IsValid(int width, int height, (int x, int y) next) => next.x >= 0 && next.y >= 0 && next.x < width && next.y < height;
 
-        private Instruction ParseInstruction(ReadOnlySpan<char> line)
+        private Instruction ParseInstruction(ReadOnlySpan<char> line, bool part2 = false)
         {
-            var direction = Instruction.DirectionFromChar(line[0]);
-            int numberEnd = line[3..].IndexOf(' ');
-            int steps = int.Parse(line[2..(2 + numberEnd + 1)]);
-            line = line[numberEnd..];
+            if (!part2)
+            {
+                var direction = Instruction.DirectionFromChar(line[0]);
+                int numberEnd = line[3..].IndexOf(' ');
+                int steps = int.Parse(line[2..(2 + numberEnd + 1)]);
 
-            int R = int.Parse(line[6..8], System.Globalization.NumberStyles.HexNumber);
-            int G = int.Parse(line[8..10], System.Globalization.NumberStyles.HexNumber);
-            int B = int.Parse(line[10..12], System.Globalization.NumberStyles.HexNumber);
+                return new Instruction(direction, steps);
+            }
+            else
+            {
+                int steps = int.Parse(line[^6..^1], NumberStyles.HexNumber);
+                var direction = Instruction.DirectionFromChar(line[^0]);
 
-            return new Instruction(direction, steps, R, G, B);
+                return new Instruction(direction, steps);
+            }
         }
 
         public override string RunPart2()
@@ -120,7 +102,7 @@ U 2 (#7a21e3)";
             return "";
         }
 
-        record struct Instruction (Direction Direction, int NumberOfSteps, int R, int G, int B)
+        record struct Instruction (Direction Direction, int NumberOfSteps)
         {
             public (int xOffset, int yOffset) GetOffset()
             {
@@ -144,11 +126,15 @@ U 2 (#7a21e3)";
                 switch (c)
                 {
                     case 'U':
+                    case '3':
                         return Direction.Up;
+                    case '1':
                     case 'D':
                         return Direction.Down;
+                    case '2':
                     case 'L':
                         return Direction.Left;
+                    case '0':
                     case 'R':
                         return Direction.Right;
                     default:
@@ -157,21 +143,20 @@ U 2 (#7a21e3)";
             }
         }
 
-        enum Direction
+        enum Direction : int
         {
-            None,
-            Up,
-            Down,
-            Left,
-            Right
+            None = 5,
+            Up = 0,
+            Down = 2,
+            Left = 3,
+            Right = 1
         }
 
-        enum TileType
+        enum Turn
         {
-            Unknown,
-            Border,
-            Outside,
-            Inside
+            Left,
+            Right,
+            None
         }
     }
 }
