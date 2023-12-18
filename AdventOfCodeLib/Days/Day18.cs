@@ -125,18 +125,18 @@ U 2 (#7a21e3)";
             {
                 switch (c)
                 {
-                    case 'U':
-                    case '3':
-                        return Direction.Up;
+                    case '0':
+                    case 'R':
+                        return Direction.Right;
                     case '1':
                     case 'D':
                         return Direction.Down;
                     case '2':
                     case 'L':
                         return Direction.Left;
-                    case '0':
-                    case 'R':
-                        return Direction.Right;
+                    case 'U':
+                    case '3':
+                        return Direction.Up;
                     default:
                         return Direction.None;
                 }
@@ -146,10 +146,10 @@ U 2 (#7a21e3)";
         enum Direction : int
         {
             None = 5,
-            Up = 0,
-            Down = 2,
-            Left = 3,
-            Right = 1
+            Right = 0,
+            Down = 1,
+            Left = 2,
+            Up = 3,
         }
 
         enum Turn
