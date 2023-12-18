@@ -9,7 +9,7 @@ namespace AdventOfCodeLib
     internal class UpdatablePriorityQueue<TElement> where TElement : notnull
     {
         private (TElement, int)[] data;
-        private Dictionary<TElement, int> elementToPosition = new();
+        private readonly Dictionary<TElement, int> elementToPosition = [];
         private int count;
 
         public UpdatablePriorityQueue()
@@ -17,8 +17,8 @@ namespace AdventOfCodeLib
             data = new (TElement, int)[128];
         }
 
-        private int GetParent(int index) => (index - 1) >> 1;
-        private int GetFirstChild(int index) => (index << 1) + 1;
+        private static int GetParent(int index) => (index - 1) >> 1;
+        private static int GetFirstChild(int index) => (index << 1) + 1;
 
         private void SetElement(int position, (TElement element, int priority) toPlace)
         {
@@ -94,7 +94,7 @@ namespace AdventOfCodeLib
         private void BubbleDown((TElement element, int priority) node, int position)
         {
             int i;
-            while ((i = GetFirstChild(position)) < count)
+            while ((i = UpdatablePriorityQueue<TElement>.GetFirstChild(position)) < count)
             {
                 (TElement element, int priority) smallestChild = data[i];
                 (TElement element, int priority) child2 = data[i + 1];
@@ -121,7 +121,7 @@ namespace AdventOfCodeLib
             (TElement element, int priority) = data[position];
             while (position != 0)
             {
-                var parentIndex = GetParent(position);
+                var parentIndex = UpdatablePriorityQueue<TElement>.GetParent(position);
                 (TElement element, int priority) parent = data[position];
 
                 if (priority < parent.priority)

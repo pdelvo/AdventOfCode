@@ -34,10 +34,7 @@ namespace AdventOfCodeLib.Days
         {
             const int maxDirection = 10;
             const int minDirection = 4;
-            checked
-            {
-                return Solve(maxDirection, minDirection).ToString();
-            }
+            return Solve(maxDirection, minDirection).ToString();
         }
 
         private int Solve(int maxDirection, int minDirection)
@@ -49,10 +46,6 @@ namespace AdventOfCodeLib.Days
             };
             //Dictionary<(int x, int y, Orientation orientation), (int x, int y, Orientation orientation)> preceding = [];
             UpdatablePriorityQueue<(int x, int y, Orientation orientation)> toVisit = new();
-            Dictionary<(int x, int y, Orientation orientation), int> toVisitMap = new()
-            {
-                { startConfiguration, 0 }
-            };
             toVisit.Enqueue(startConfiguration, 0);
             int shortestPathFound = int.MaxValue;
             while (toVisit.Count > 0)
@@ -168,7 +161,5 @@ namespace AdventOfCodeLib.Days
             Vertical,
             None
         }
-
- 
     }
 }
