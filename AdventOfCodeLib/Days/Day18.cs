@@ -48,7 +48,6 @@ U 2 (#7a21e3)";
 
             while (instructions.Count > 4)
             {
-                Console.WriteLine(instructions.Count);
                 var instruction0Node = instructions.First!;
 
                 // Find the smallest corner
