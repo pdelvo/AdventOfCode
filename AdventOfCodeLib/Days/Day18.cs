@@ -1,5 +1,7 @@
 ﻿
+using System;
 using System.Globalization;
+using System.Numerics;
 
 namespace AdventOfCodeLib.Days
 {
@@ -25,35 +27,242 @@ U 2 (#7a21e3)";
         public override string TestOutput2 => "952408144115";
         public override string RunPart1()
         {
-            List<(int x, int y, Turn turn)> points = [(0, 0, Turn.None)];
-            List<Instruction> instructions = new();
-            long insideCounter = 0;
+            return Compute(false).ToString();
+        }
 
-            for (int i = 0; i < Lines.Length; i++)
+        public override string RunPart2()
+        {
+            return "";
+            return Compute(true).ToString();
+        }
+
+        private string Compute(bool isPart2)
+        {
+            checked
             {
-                Instruction instruction = ParseInstruction(Lines[i]);
+                List<(int x, int y, Turn turn)> points = [(0, 0, Turn.None)];
+                LinkedList<Instruction> instructions = new();
+                BigInteger insideCounter = 0;
 
-                var (moveX, moveY) = instruction.GetOffset();
-
-                var currentPoint = points[i];
-
-                (int x, int y) nextPoint = (currentPoint.x + moveX * instruction.NumberOfSteps, currentPoint.y + moveY * instruction.NumberOfSteps);
-
-                if (instructions.Count > 1)
+                for (int i = 0; i < Lines.Length; i++)
                 {
-                    var turn1 = GetTurnType(instructions[i - 2], instructions[i - 1]);
-                    var turn2 = GetTurnType(instructions[i - 1], instruction);
+                    Instruction instruction = ParseInstruction(Lines[i], isPart2);
+                    instructions.AddLast(instruction);
+                }
+
+                var instruction0Node = instructions.First!;
+
+                for (int i = 0; ; i++)
+                {
+                    if (instructions.Count == 4)
+                    {
+                        insideCounter += ((BigInteger)instructions.First!.Value.NumberOfSteps + 1) * ((BigInteger)instructions.First.Next!.Value.NumberOfSteps + 1);
+                        break;
+                    }
+
+                    var instruction1Node = GetNextCycle(instruction0Node);
+                    var instruction2Node = GetNextCycle(instruction1Node);
+                    var instruction3Node = GetNextCycle(instruction2Node);
+                    var instruction4Node = GetNextCycle(instruction3Node);
+                    Instruction instruction0 = instruction0Node.Value;
+                    Instruction instruction1 = instruction1Node.Value;
+                    Instruction instruction2 = instruction2Node.Value;
+                    Instruction instruction3 = instruction3Node.Value;
+                    Instruction instruction4 = instruction4Node.Value;
+
+                    var turn0 = GetTurnType(instruction0, instruction1);
+                    var turn1 = GetTurnType(instruction1, instruction2);
+                    var turn2 = GetTurnType(instruction2, instruction3);
+                    var turn3 = GetTurnType(instruction3, instruction4);
+
+                    if (turn0 == turn1 && turn1 == turn2 && turn2 == turn3)
+                    {
+                        // Scary case. Don't want to. Find something else
+                        continue;
+                    }
 
                     if (turn1 == turn2)
                     {
+                        long shorterSide;
+                        if (instruction1.NumberOfSteps == instruction3.NumberOfSteps)
+                        {
+                            shorterSide = instruction1.NumberOfSteps;
+                            instruction0Node.ValueRef = instruction0 with { NumberOfSteps = instruction0.NumberOfSteps + instruction2.NumberOfSteps + instruction4.NumberOfSteps };
 
+                            instructions.Remove(instruction1Node);
+                            instructions.Remove(instruction2Node);
+                            instructions.Remove(instruction3Node);
+                            instructions.Remove(instruction4Node);
+                            if (instruction2.Direction != instruction0.Direction)
+                            {
+                                insideCounter -= instruction0.NumberOfSteps;
+                            }
+                            if (instruction2.Direction != instruction4.Direction)
+                            {
+                                insideCounter -= instruction4.NumberOfSteps;
+                            }
+                        }
+                        else if (instruction1.NumberOfSteps < instruction3.NumberOfSteps)
+                        {
+                            shorterSide = instruction1.NumberOfSteps;
+
+                            instruction0Node.ValueRef = instruction0 with
+                            {
+                                Direction = instruction2.Direction,
+                                NumberOfSteps = instruction2.NumberOfSteps + (instruction2.Direction == instruction0.Direction ? instruction0.NumberOfSteps : -instruction0.NumberOfSteps)
+                            };
+
+                            instructions.Remove(instruction1Node);
+                            instructions.Remove(instruction2Node);
+
+                            instruction3Node.ValueRef = instruction3 with { NumberOfSteps = instruction3.NumberOfSteps - instruction1.NumberOfSteps };
+
+
+                            if (instruction2.Direction != instruction0.Direction)
+                            {
+                                insideCounter += instruction0.NumberOfSteps;
+                            }
+                        }
+                        else
+                        {
+                            shorterSide = instruction3.NumberOfSteps;
+                            instruction4Node.ValueRef = instruction4 with
+                            {
+                                Direction = instruction2.Direction,
+                                NumberOfSteps = instruction2.NumberOfSteps + (instruction2.Direction == instruction4.Direction ? instruction4.NumberOfSteps : -instruction4.NumberOfSteps)
+                            };
+
+                            instructions.Remove(instruction3Node);
+                            instructions.Remove(instruction2Node);
+
+                            instruction1Node.ValueRef = instruction1 with { NumberOfSteps = instruction1.NumberOfSteps - instruction3.NumberOfSteps };
+
+
+                            if (instruction2.Direction != instruction4.Direction)
+                            {
+                                insideCounter += instruction4.NumberOfSteps;
+                            }
+                        }
+
+                        if (turn1 == Turn.Left)
+                        {
+                            insideCounter -= (BigInteger)shorterSide * ((BigInteger)instruction2.NumberOfSteps - 1);
+                        }
+                        else
+                        {
+                            insideCounter += (BigInteger)shorterSide * ((BigInteger)instruction2.NumberOfSteps + 1);
+                        }
                     }
+                    else
+                    {
+                        instruction0Node = instruction1Node;
+                    }
+
+                    // Debug:
+                    var fillSolution = FillAlgorithm(instructions) + insideCounter;
+
+
                 }
-                instructions.Add(instruction);
-                points.Add((nextPoint.x, nextPoint.y, );
+
+                return insideCounter.ToString();
+            }
+        }
+
+        private int FillAlgorithm(LinkedList<Instruction> instructions)
+        {
+            int width = 1000;
+            int height = 1000;
+            (int x, int y) start = (500, 500);
+            (int currentX, int currentY) = start;
+
+            TileType[][] tiles = new TileType[height][];
+
+            for (int i = 0; i < height; i++)
+            {
+                tiles[i] = new TileType[width];
             }
 
-            return insideCounter.ToString();
+            tiles[currentY][currentX] = TileType.Border;
+
+            foreach (Instruction instruction in instructions)
+            {
+
+                var (moveX, moveY) = instruction.GetOffset();
+
+                for (int step = 1; step <= instruction.NumberOfSteps; step++)
+                {
+                    (currentX, currentY) = (currentX + moveX, currentY + moveY);
+
+                    tiles[currentY][currentX] = TileType.Border;
+                }
+            }
+
+            if (currentX != start.x || currentY != start.y)
+            {
+                throw new InvalidOperationException("Something is wrong here, not a cycle");
+            }
+
+            // Do a fill
+            Queue<(int x, int y)> toCheck = new();
+
+            for (int i = 0; i < width; i++)
+            {
+                toCheck.Enqueue((0, i));
+                toCheck.Enqueue((width - 1, i));
+            }
+
+            for (int i = 1; i < height - 1; i++)
+            {
+                toCheck.Enqueue((i, 0));
+                toCheck.Enqueue((i, height - 1));
+            }
+
+            while (toCheck.Count > 0)
+            {
+                var next = toCheck.Dequeue();
+
+                if (IsValid(width, height, next))
+                {
+                    if (tiles[next.y][next.x] == TileType.Unknown)
+                    {
+                        tiles[next.y][next.x] = TileType.Outside;
+                        toCheck.Enqueue((next.x + 1, next.y));
+                        toCheck.Enqueue((next.x, next.y + 1));
+                        toCheck.Enqueue((next.x - 1, next.y));
+                        toCheck.Enqueue((next.x, next.y - 1));
+                    }
+                }
+            }
+
+            int insideCounter = 0;
+
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    if (tiles[j][i] == TileType.Unknown
+                        || tiles[j][i] == TileType.Border)
+                    {
+                        insideCounter++;
+                    }
+                }
+            }
+
+            return insideCounter;
+        }
+
+        private static bool IsValid(int width, int height, (int x, int y) next) => next.x >= 0 && next.y >= 0 && next.x < width && next.y < height;
+
+
+        private static LinkedListNode<T> GetNextCycle<T>(LinkedListNode<T> node)
+        {
+            var list = node.List!;
+            if (list.Last == node)
+            {
+                return list.First!;
+            }
+
+            return node.Next!;
         }
 
         private Turn GetTurnType(Instruction instruction1, Instruction instruction2)
@@ -63,20 +272,18 @@ U 2 (#7a21e3)";
                 return Turn.None;
             }
 
-            if (instruction1.Direction + 1 % 4 == instruction2.Direction)
+            if (((int)instruction1.Direction + 1) % 4 == (int)instruction2.Direction)
             {
                 return Turn.Right;
             }
 
-            if (instruction1.Direction == instruction2.Direction + 1 % 4)
+            if ((int)instruction1.Direction == ((int)instruction2.Direction + 1) % 4)
             {
-                return Turn.Right;
+                return Turn.Left;
             }
 
             return Turn.None;
         }
-
-        private static bool IsValid(int width, int height, (int x, int y) next) => next.x >= 0 && next.y >= 0 && next.x < width && next.y < height;
 
         private Instruction ParseInstruction(ReadOnlySpan<char> line, bool part2 = false)
         {
@@ -90,16 +297,11 @@ U 2 (#7a21e3)";
             }
             else
             {
-                int steps = int.Parse(line[^6..^1], NumberStyles.HexNumber);
-                var direction = Instruction.DirectionFromChar(line[^0]);
+                int steps = int.Parse(line[^7..^2], NumberStyles.HexNumber);
+                var direction = Instruction.DirectionFromChar(line[^2]);
 
                 return new Instruction(direction, steps);
             }
-        }
-
-        public override string RunPart2()
-        {
-            return "";
         }
 
         record struct Instruction (Direction Direction, int NumberOfSteps)
@@ -157,6 +359,14 @@ U 2 (#7a21e3)";
             Left,
             Right,
             None
+        }
+
+        enum TileType
+        {
+            Unknown,
+            Border,
+            Outside,
+            Inside
         }
     }
 }
