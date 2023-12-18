@@ -134,7 +134,9 @@ namespace AdventOfCode
             grid.Children.Add(new Cell("result") { Color = Blue, Align = Align.Center });
             grid.Children.Add(new Cell("time") { Color = Red, Align = Align.Center });
 
-            foreach (var (dayText, test1, result1, time1InUs, test2, result2, time2InUs) in table)
+            double sumTime1 = 0;
+            double sumTime2 = 0;
+            foreach (var (dayText, test1, result1, time1InS, test2, result2, time2InS) in table)
             {
                 grid.Children.Add(new Cell(dayText) { Color = White, Align = Align.Left });
                 var testText = "";
@@ -155,10 +157,19 @@ namespace AdventOfCode
                 }
                 grid.Children.Add(new Cell(testText) { Color = White, Align = Align.Right });
                 grid.Children.Add(new Cell(result1) { Color = White, Align = Align.Right });
-                grid.Children.Add(new Cell(FormatTime(time1InUs)) { Color = White, Align = Align.Right });
+                grid.Children.Add(new Cell(FormatTime(time1InS)) { Color = White, Align = Align.Right });
                 grid.Children.Add(new Cell(result2) { Color = White, Align = Align.Right });
-                grid.Children.Add(new Cell(FormatTime(time2InUs)) { Color = White, Align = Align.Right });
+                grid.Children.Add(new Cell(FormatTime(time2InS)) { Color = White, Align = Align.Right });
+
+                sumTime1 += time1InS ?? 0;
+                sumTime2 += time2InS ?? 0;
             }
+            grid.Children.Add(new Cell("Total: " + FormatTime(sumTime1 + sumTime2)) { Color = White, Align = Align.Right });
+            grid.Children.Add(new Cell("") { Color = White, Align = Align.Right });
+            grid.Children.Add(new Cell("") { Color = White, Align = Align.Right });
+            grid.Children.Add(new Cell(FormatTime(sumTime1)) { Color = White, Align = Align.Right });
+            grid.Children.Add(new Cell("") { Color = White, Align = Align.Right });
+            grid.Children.Add(new Cell(FormatTime(sumTime2)) { Color = White, Align = Align.Right });
 
             //Console.Clear();
             Console.CursorVisible = false;
