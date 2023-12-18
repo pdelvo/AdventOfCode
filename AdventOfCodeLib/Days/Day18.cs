@@ -51,6 +51,11 @@ U 2 (#7a21e3)";
                 Console.WriteLine(instructions.Count);
                 var instruction0Node = instructions.First!;
 
+                // Find the smallest corner
+                //  ------
+                //  |    |
+                //  |    |
+                //
                 int minDistance = int.MaxValue;
                 LinkedListNode<Instruction>? minNode = null;
                 for (int i = 0; i < instructions.Count; i++)
@@ -70,11 +75,7 @@ U 2 (#7a21e3)";
                     var t2 = GetTurnType(inst2, inst3);
                     var t3 = GetTurnType(inst3, inst4);
 
-                    if (t0 == t1 && t1 == t2 && t2 == t3)
-                    {
-                        // Scary case. Don't want to. Find something else
-                    }
-                    else if (t1 == t2)
+                    if (t1 == t2)
                     {
                         if (inst2.NumberOfSteps < minDistance)
                         {
@@ -169,100 +170,11 @@ U 2 (#7a21e3)";
                 {
                     insideCounter += (BigInteger)shorterSide * ((BigInteger)instruction2.NumberOfSteps + 1);
                 }
-
-                // Debug:
-                //var fillSolution = FillAlgorithm(instructions) + insideCounter;
             }
             insideCounter += ((BigInteger)instructions.First!.Value.NumberOfSteps + 1) * ((BigInteger)instructions.First.Next!.Value.NumberOfSteps + 1);
 
             return insideCounter.ToString();
         }
-
-        private int FillAlgorithm(LinkedList<Instruction> instructions)
-        {
-            int width = 1000;
-            int height = 1000;
-            (int x, int y) start = (500, 500);
-            (int currentX, int currentY) = start;
-
-            TileType[][] tiles = new TileType[height][];
-
-            for (int i = 0; i < height; i++)
-            {
-                tiles[i] = new TileType[width];
-            }
-
-            tiles[currentY][currentX] = TileType.Border;
-
-            foreach (Instruction instruction in instructions)
-            {
-
-                var (moveX, moveY) = instruction.GetOffset();
-
-                for (int step = 1; step <= instruction.NumberOfSteps; step++)
-                {
-                    (currentX, currentY) = (currentX + moveX, currentY + moveY);
-
-                    tiles[currentY][currentX] = TileType.Border;
-                }
-            }
-
-            if (currentX != start.x || currentY != start.y)
-            {
-                throw new InvalidOperationException("Something is wrong here, not a cycle");
-            }
-
-            // Do a fill
-            Queue<(int x, int y)> toCheck = new();
-
-            for (int i = 0; i < width; i++)
-            {
-                toCheck.Enqueue((0, i));
-                toCheck.Enqueue((width - 1, i));
-            }
-
-            for (int i = 1; i < height - 1; i++)
-            {
-                toCheck.Enqueue((i, 0));
-                toCheck.Enqueue((i, height - 1));
-            }
-
-            while (toCheck.Count > 0)
-            {
-                var next = toCheck.Dequeue();
-
-                if (IsValid(width, height, next))
-                {
-                    if (tiles[next.y][next.x] == TileType.Unknown)
-                    {
-                        tiles[next.y][next.x] = TileType.Outside;
-                        toCheck.Enqueue((next.x + 1, next.y));
-                        toCheck.Enqueue((next.x, next.y + 1));
-                        toCheck.Enqueue((next.x - 1, next.y));
-                        toCheck.Enqueue((next.x, next.y - 1));
-                    }
-                }
-            }
-
-            int insideCounter = 0;
-
-            for (int i = 0; i < width; i++)
-            {
-                for (int j = 0; j < height; j++)
-                {
-                    if (tiles[j][i] == TileType.Unknown
-                        || tiles[j][i] == TileType.Border)
-                    {
-                        insideCounter++;
-                    }
-                }
-            }
-
-            return insideCounter;
-        }
-
-        private static bool IsValid(int width, int height, (int x, int y) next) => next.x >= 0 && next.y >= 0 && next.x < width && next.y < height;
-
 
         private static LinkedListNode<T> GetNextCycle<T>(LinkedListNode<T> node)
         {
@@ -369,14 +281,6 @@ U 2 (#7a21e3)";
             Left,
             Right,
             None
-        }
-
-        enum TileType
-        {
-            Unknown,
-            Border,
-            Outside,
-            Inside
         }
     }
 }
