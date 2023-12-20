@@ -336,7 +336,7 @@ hdj{m>838:A,pv}
         }
     }
 
-    record WorkflowRule(char type, ComparisonType comparisonType, int threshold, int jumpTo)
+    record struct WorkflowRule(char type, ComparisonType comparisonType, int threshold, int jumpTo)
     {
         public bool Matches(Part part)
         {
