@@ -1,10 +1,4 @@
-﻿
-using System;
-using System.ComponentModel.Design;
-using System.Data;
-using System.Globalization;
-using System.Numerics;
-using System.Text.RegularExpressions;
+﻿using System.Numerics;
 
 namespace AdventOfCodeLib.Days
 {

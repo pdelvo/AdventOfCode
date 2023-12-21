@@ -1,8 +1,4 @@
-﻿using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
-
-namespace AdventOfCodeLib.Days
+﻿namespace AdventOfCodeLib.Days
 {
     public class Day17 : Day
     {

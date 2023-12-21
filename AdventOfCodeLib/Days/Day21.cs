@@ -1,12 +1,4 @@
-﻿
-using System;
-using System.ComponentModel.Design;
-using System.Data;
-using System.Diagnostics;
-using System.Globalization;
-using System.Numerics;
-using System.Reflection.Metadata.Ecma335;
-using System.Text.RegularExpressions;
+﻿using System.Diagnostics;
 
 namespace AdventOfCodeLib.Days
 {

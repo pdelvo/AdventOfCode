@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace AdventOfCodeLib.Days
+﻿namespace AdventOfCodeLib.Days
 {
     public class Day12 : Day
     {

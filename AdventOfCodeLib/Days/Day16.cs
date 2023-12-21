@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
-
-namespace AdventOfCodeLib.Days
+﻿namespace AdventOfCodeLib.Days
 {
     public class Day16 : Day
     {

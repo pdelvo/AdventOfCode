@@ -1,14 +1,4 @@
-﻿
-using System;
-using System.ComponentModel.Design;
-using System.Data;
-using System.Diagnostics;
-using System.Globalization;
-using System.Numerics;
-using System.Reflection.Metadata.Ecma335;
-using System.Text.RegularExpressions;
-
-namespace AdventOfCodeLib.Days
+﻿namespace AdventOfCodeLib.Days
 {
     public class Day20 : Day
     {
